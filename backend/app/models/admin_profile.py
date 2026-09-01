@@ -12,4 +12,4 @@ class AdminProfile(Base):
     department = Column(String, nullable=True)  # placeholder, à ajuster si besoin
 
     user = relationship("User", back_populates="admin_profile")
-    a
+    
