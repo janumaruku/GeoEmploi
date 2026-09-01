@@ -7,7 +7,7 @@ from app.db.base import Base
 
 class ApplicationStatus(str, enum.Enum):
     PENDING = "pending"
-    VIEWED = "viewed"
+    #VIEWED = "viewed"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
 
