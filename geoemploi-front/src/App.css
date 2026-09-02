@@ -240,3 +240,188 @@ button:focus-visible {
   outline: 3px solid #000000;
   outline-offset: 3px;
 }
+
+
+/* =========================================
+   AJOUTS : MODALE DE CONNEXION GÉOEMPLOI
+   ========================================= */
+
+/* Fond assombri derrière la modale */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Boîte de la modale */
+.modal-content {
+  background: var(--background-navbar);
+  padding: 32px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  color: var(--text-dark);
+  position: relative;
+  font-family: var(--font-body);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  font-family: var(--font-title);
+  color: var(--institutional-blue);
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+/* Bouton pour fermer (X) */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+}
+
+.close-btn:hover {
+  color: var(--marker-color);
+}
+
+/* Onglets de sélection (Demandeur / Entreprise) */
+.role-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.role-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  background: #f9f9f9;
+  cursor: pointer;
+  font-family: var(--font-title);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.role-tabs button.active {
+  background: var(--institutional-blue);
+  color: var(--text-light);
+  border-color: var(--institutional-blue);
+  font-weight: bold;
+}
+
+/* Champs du formulaire */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 6px;
+}
+
+.input-group label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+.input-group input {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.input-group input:focus {
+  outline: 2px solid var(--institutional-blue);
+  border-color: transparent;
+}
+
+/* Bouton de validation du formulaire */
+.submit-btn {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--institutional-blue);
+  color: var(--text-light);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  opacity: 0.9;
+}
+
+/* Séparateur "OU" */
+.divider {
+  margin: 24px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  position: relative;
+  font-family: var(--font-title);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+/* Bouton Google */
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-btn:hover {
+  background: #f2f4f8;
+}
