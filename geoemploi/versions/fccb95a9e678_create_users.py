@@ -17,23 +17,20 @@ down_revision = None
 
 
 def upgrade() -> None:
-    op.execute("""
-        CREATE TABLE users (
-            id SERIAL PRIMARY KEY,
-            email VARCHAR UNIQUE NOT NULL,
-            role VARCHAR NOT NULL,
-            password_hash VARCHAR NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            deleted_at TIMESTAMP NULL
-        );
-    """)
+    op.create_table(
+        'users',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('email', sa.String, unique=True, nullable=False),
+        sa.Column('role', sa.String, nullable=False),
+        sa.Column('password_hash', sa.String, nullable=False),
+        sa.Column('created_at', sa.DateTime, server_default=sa.func.current_timestamp()),
+        sa.Column('updated_at', sa.DateTime, server_default=sa.func.current_timestamp()),
+        sa.Column('deleted_at', sa.DateTime, nullable=True),
+    )
 
-    op.execute("""
-        CREATE INDEX idx_users_email ON users(email);
-    """)
+    op.create_index('idx_users_email', 'users', ['email'])
 
 
 def downgrade() -> None:
-    op.execute("DROP INDEX IF EXISTS idx_users_email;")
-    op.execute("DROP TABLE IF EXISTS users CASCADE;")
+    op.drop_index('idx_users_email')
+    op.drop_table('users')
