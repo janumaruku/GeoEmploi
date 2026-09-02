@@ -2,11 +2,17 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  // État pour afficher ou masquer la modale de connexion
+  //Afficher ou masquer la modale de connexion
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   
-  // (Demandeur d'emploi ou Entreprise)
+  // Gérer le type d'utilisateur sélectionné (Demandeur ou Entreprise)
   const [role, setRole] = useState('demandeur');
+
+  // État pour afficher ou masquer la modale d'inscription
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  
+  // État pour gérer le type d'utilisateur sélectionné pour l'inscription
+  const [registerRole, setRegisterRole] = useState('demandeur');
 
   return (
     <div className="app">
@@ -22,12 +28,13 @@ function App() {
         </div>
 
         <nav className="navbar-right">
-          {/* qunad on clic sur ce bouton, on passe l'état isLoginOpen à true pour ouvrir la modale */}
+          {/* isLoginOpen à true pour ouvrir la modale */}
           <button className="login-button" onClick={() => setIsLoginOpen(true)}>
             Se connecter
           </button>
 
-          <button className="register-button">
+          {/* modale d'inscription */}
+          <button className="register-button" onClick={() => setIsRegisterOpen(true)}>
             S’enregistrer
           </button>
         </nav>
@@ -48,15 +55,16 @@ function App() {
       </main>
 
       {/* MODALE DE CONNEXION */}
+      {/* isLoginOpen est vrai, affiche la div qui se superpose à l'application */}
       {isLoginOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            {/* Bouton pour fermer la modale (repasse isLoginOpen à false) */}
+            {/* fermer la modale (repasse isLoginOpen à false) */}
             <button className="close-btn" onClick={() => setIsLoginOpen(false)}>X</button>
             
             <h2>Connexion</h2>
 
-            {/* Onglets de sélection du rôle */}
+            {/* rôle */}
             <div className="role-tabs">
               <button 
                 className={role === 'demandeur' ? 'active' : ''} 
@@ -72,10 +80,9 @@ function App() {
               </button>
             </div>
 
-            {/* Formulaire de connexion */}
+            {/* form de connexion */}
             <form className="login-form">
               <div className="input-group">
-                {/* Le label s'adapte en fonction du rôle */}
                 <label>
                   {role === 'demandeur' 
                     ? "Email, Nom d'utilisateur ou N° de téléphone" 
@@ -85,7 +92,7 @@ function App() {
                   type={role === 'entreprise' ? 'email' : 'text'} 
                   placeholder={
                     role === 'demandeur' 
-                      ? "Ton identifiant..." 
+                      ? "identifiant..." 
                       : "prenom.nom@entreprise.com"
                   } 
                   required 
@@ -94,7 +101,7 @@ function App() {
 
               <div className="input-group">
                 <label>Mot de passe</label>
-                <input type="password" placeholder="Ton mot de passe..." required />
+                <input type="password" placeholder="mot de passe..." required />
               </div>
 
               <button type="submit" className="submit-btn">
@@ -107,6 +114,91 @@ function App() {
             {/* Connexion Google */}
             <button className="google-btn">
               Se connecter avec Google
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE D'INSCRIPTION (NOUVEAU) */}
+      {/* Si isRegisterOpen est vrai, on affiche cette modale */}
+      {isRegisterOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {/*fermer la modale d'inscription */}
+            <button className="close-btn" onClick={() => setIsRegisterOpen(false)}>X</button>
+            
+            <h2>Créer un compte</h2>
+
+            {/* rôle pour l'inscription */}
+            <div className="role-tabs">
+              <button 
+                className={registerRole === 'demandeur' ? 'active' : ''} 
+                onClick={() => setRegisterRole('demandeur')}
+              >
+                Candidat
+              </button>
+              <button 
+                className={registerRole === 'entreprise' ? 'active' : ''} 
+                onClick={() => setRegisterRole('entreprise')}
+              >
+                Recruteur
+              </button>
+            </div>
+
+            {/* form d'inscription dynamique */}
+            <form className="login-form">
+              
+              {/* Affichage conditionnel des champs selon le rôle */}
+              {registerRole === 'demandeur' ? (
+                <>
+                  {/* Champs  Demandeur d'emploi */}
+                  <div className="input-group">
+                    <label>Prénom</label>
+                    <input type="text" placeholder="prénom..." required />
+                  </div>
+                  <div className="input-group">
+                    <label>Nom</label>
+                    <input type="text" placeholder="nom..." required />
+                  </div>
+                  <div className="input-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="adresse email..." required />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Champs Entreprise */}
+                  <div className="input-group">
+                    <label>Nom de l'entreprise</label>
+                    <input type="text" placeholder="Raison sociale de l'entreprise..." required />
+                  </div>
+                  <div className="input-group">
+                    <label>Email professionnel</label>
+                    <input type="email" placeholder="prenom.nom@entreprise.com" required />
+                  </div>
+                  <div className="input-group">
+                    <label>Numéro SIRET (Optionnel)</label>
+                    <input type="text" placeholder="Ex: 123 456 789 00012" />
+                  </div>
+                </>
+              )}
+
+              {/* Champ commun aux deux (Mot de passe) */}
+              <div className="input-group">
+                <label>Créer un mot de passe</label>
+                <input type="password" placeholder="Choisis un mot de passe sécurisé..." required />
+              </div>
+
+              <button type="submit" className="submit-btn">
+                S'inscrire en tant que {registerRole === 'demandeur' ? 'Candidat' : 'Employeur'}
+              </button>
+            </form>
+
+            <div className="divider">OU</div>
+
+            {/* Inscription Google */}
+            <button className="google-btn">
+              S'inscrire avec Google
             </button>
           </div>
         </div>
