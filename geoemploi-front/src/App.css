@@ -20,14 +20,14 @@
   --font-body: "Spectral", Georgia, serif;
 }
 
-/* APPLICATION */
+/* Application */
 .app {
   width: 100%;
   min-height: 100vh;
   background: var(--background-dark);
 }
 
-/* NAVBAR */
+/* navbar */
 .navbar {
   height: 80px;
   display: flex;
@@ -103,7 +103,7 @@
   background: #f2f4f8;
 }
 
-/* CARTE */
+/* carte */
 .map-container {
   height: calc(100vh - 80px);
   width: 100%;
@@ -240,9 +240,9 @@ button:focus-visible {
 }
 
 .role-tabs button.active {
-  background: var(--institutional-blue);
-  color: var(--text-light);
-  border-color: var(--institutional-blue);
+  background: transparent;
+  color: var(--institutional-blue);
+  border: 2px solid var(--institutional-blue);
   font-weight: bold;
 }
 
@@ -279,22 +279,22 @@ button:focus-visible {
   outline: 2px solid var(--institutional-blue);
   border-color: transparent;
 }
-
 .submit-btn {
   margin-top: 8px;
   padding: 12px;
-  background: var(--institutional-blue);
-  color: var(--text-light);
-  border: none;
+  background: transparent;
+  color: var(--institutional-blue);
+  border: 2px solid var(--institutional-blue);
   border-radius: 4px;
   font-family: var(--font-title);
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .submit-btn:hover {
-  opacity: 0.9;
+  background: rgba(27, 58, 107, 0.05); /* léger voile bleu au survol*/
 }
 
 .divider {
