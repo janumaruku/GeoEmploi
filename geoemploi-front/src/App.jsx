@@ -17,7 +17,7 @@ function App() {
   // Gérer le type d'utilisateur sélectionné pour l'inscription
   const [registerRole, setRegisterRole] = useState('demandeur');
 
-  // chargement (2 secondes)
+  // charge(2 secondes)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -30,9 +30,16 @@ function App() {
     return (
       <div className="loader-screen">
         <div className="loader-content">
-          <div className="ministere">
-            <span>MINISTÈRE</span>
-            <span>DU JOB ET BONHEUR</span>
+          <div className="bloc-marque">
+            <svg className="drapeau" width="60" height="40" viewBox="0 0 90 60">
+              <rect width="30" height="60" fill="#000091"/>
+              <rect x="30" width="30" height="60" fill="#ffffff"/>
+              <rect x="60" width="30" height="60" fill="#e1000f"/>
+            </svg>
+            <div className="ministere">
+              <span>MINISTÈRE</span>
+              <span>DU JOB ET BONHEUR</span>
+            </div>
           </div>
            <div className="separator"></div>
           <h1 className="logo">ChomageGo</h1>
@@ -48,9 +55,16 @@ function App() {
       {/* HEADER */}
       <header className="navbar">
         <div className="navbar-left">
-          <div className="ministere">
-            <span>MINISTÈRE</span>
-            <span>DU JOB ET BONHEUR</span>
+          <div className="bloc-marque">
+            <svg className="drapeau" width="54" height="36" viewBox="0 0 90 60">
+              <rect width="30" height="60" fill="#000091"/>
+              <rect x="30" width="30" height="60" fill="#ffffff"/>
+              <rect x="60" width="30" height="60" fill="#e1000f"/>
+            </svg>
+            <div className="ministere">
+              <span>MINISTÈRE</span>
+              <span>DU JOB ET BONHEUR</span>
+            </div>
           </div>
           <div className="separator"></div>
           <h1 className="logo">ChomageGo</h1>
@@ -204,7 +218,7 @@ function App() {
                   </div>
                   <div className="input-group">
                     <label>Email professionnel</label>
-                    <input type="email" placeholder="prenom.nom@entreprise.com" required />
+                    <input type="email" placeholder="nom@entreprise.com" required />
                   </div>
                   <div className="input-group">
                     <label>Numéro SIRET (Optionnel)</label>
