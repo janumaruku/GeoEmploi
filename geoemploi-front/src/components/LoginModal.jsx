@@ -24,9 +24,9 @@ function LoginModal({ isOpen, onClose, onSubmit, isSubmitting, error }) {
     <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
       <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fermer la connexion">×</button>
-        <p className="eyebrow">Espace candidat</p>
+        <p className="eyebrow">Espace personnel</p>
         <h2 id="login-title">Se connecter</h2>
-        <p className="modal-intro">Connectez-vous pour envoyer votre candidature.</p>
+        <p className="modal-intro">Connectez-vous avec votre adresse e-mail.</p>
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Adresse e-mail</label>
           <input ref={emailRef} id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />

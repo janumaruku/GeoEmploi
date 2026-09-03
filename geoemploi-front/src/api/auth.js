@@ -8,3 +8,11 @@ export function login(email, password) {
     body: form,
   })
 }
+
+export function registerUser(data) {
+  return apiRequest('/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
