@@ -128,7 +128,7 @@ function App() {
               <div className="input-group">
                 <label>
                   {role === 'demandeur' 
-                    ? "Email, Nom d'utilisateur ou N° de téléphone" 
+                    ? "Email, Nom d'utilisateur" 
                     : "Email professionnel"}
                 </label>
                 <input 
