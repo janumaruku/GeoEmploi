@@ -109,17 +109,18 @@ function App() {
               </button>
             </form>
 
-            <div className="divider">OU</div>
+            {/*<div className="divider">OU</div>*/}
 
-            {/* Connexion Google */}
+            {/* Connexion Google }
             <button className="google-btn">
               Se connecter avec Google
             </button>
+      */}
           </div>
         </div>
       )}
 
-      {/* MODALE D'INSCRIPTION (NOUVEAU) */}
+      {/* MODALE D'INSCRIPTION */}
       {/* Si isRegisterOpen est vrai, on affiche cette modale */}
       {isRegisterOpen && (
         <div className="modal-overlay">
@@ -194,12 +195,13 @@ function App() {
               </button>
             </form>
 
-            <div className="divider">OU</div>
+            {/*<div className="divider">OU</div>*/}
 
-            {/* Inscription Google */}
+            {/* Inscription Google}
             <button className="google-btn">
               S'inscrire avec Google
             </button>
+      */}
           </div>
         </div>
       )}
