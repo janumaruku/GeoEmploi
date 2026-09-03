@@ -143,6 +143,44 @@
   background: #f2f4f8;
 }
 
+/* Écran de chargement */
+.loader-screen {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--background-navbar);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f2f4f8;
+  border-top: 4px solid var(--institutional-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loader-text {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* carte */
 .map-container {
   height: calc(100vh - 80px);

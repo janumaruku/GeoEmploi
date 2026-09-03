@@ -1,18 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  // État pour l'écran de chargement
+  const [isLoading, setIsLoading] = useState(true);
+
   //Afficher ou masquer la modale de connexion
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   
   // Gérer le type d'utilisateur sélectionné (Demandeur ou Entreprise)
   const [role, setRole] = useState('demandeur');
 
-  // État pour afficher ou masquer la modale d'inscription
+  // afficher ou masquer la modale d'inscription
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   
-  // État pour gérer le type d'utilisateur sélectionné pour l'inscription
+  // Gérer le type d'utilisateur sélectionné pour l'inscription
   const [registerRole, setRegisterRole] = useState('demandeur');
+
+  // chargement (2 secondes)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // écran de chargement 
+  if (isLoading) {
+    return (
+      <div className="loader-screen">
+        <div className="loader-content">
+          <div className="ministere">
+            <span>MINISTÈRE</span>
+            <span>DU JOB ET BONHEUR</span>
+          </div>
+           <div className="separator"></div>
+          <h1 className="logo">ChomageGo</h1>
+          <div className="loader-spinner"></div>
+          <p className="loader-text">Chargement des données géolocalisées...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -24,7 +53,7 @@ function App() {
             <span>DU JOB ET BONHEUR</span>
           </div>
           <div className="separator"></div>
-          <h1 className="logo">GéoEmploi</h1>
+          <h1 className="logo">ChomageGo</h1>
         </div>
 
         <nav className="navbar-right">
@@ -152,7 +181,7 @@ function App() {
               {/* Affichage conditionnel des champs selon le rôle */}
               {registerRole === 'demandeur' ? (
                 <>
-                  {/* Champs  Demandeur d'emploi */}
+                  {/* Champs Demandeur d'emploi */}
                   <div className="input-group">
                     <label>Prénom</label>
                     <input type="text" placeholder="prénom..." required />
