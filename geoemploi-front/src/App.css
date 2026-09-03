@@ -1,0 +1,452 @@
+/* Marianne (Corps de texte ou Titres) */
+@font-face {
+  font-family: "Marianne";
+  src: url("/fonts/Marianne_2022/fontes%20web/Marianne-Regular.woff2") format("woff2"),
+       url("/fonts/Marianne_2022/fontes%20web/Marianne-Regular.woff") format("woff"),
+       url("/fonts/Marianne_2022/fontes%20desktop/TTF/Marianne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Marianne Bold ( pour les titres h1, h2) */
+@font-face {
+  font-family: "Marianne";
+  src: url("/fonts/Marianne_2022/fontes%20web/Marianne-Bold.woff2") format("woff2"),
+       url("/fonts/Marianne_2022/fontes%20web/Marianne-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Spectral*/
+@font-face {
+  font-family: "Spectral";
+  src: url("/fonts/Spectral_v2.001/Spectral-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Spectral */
+@font-face {
+  font-family: "Spectral";
+  src: url("/fonts/Spectral_v2.001/Spectral-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+
+  --institutional-blue: #1B3A6B;
+
+  --background-dark: #121212;
+  --background-navbar: #ffffff;
+
+  --text-dark: #171717;
+  --text-light: #ffffff;
+  --text-secondary: #666666;
+
+  --border-color: #dddddd;
+
+  --marker-color: #d93030;
+
+  --font-title: "Marianne", Arial, sans-serif;
+  --font-body: "Spectral", Georgia, serif;
+}
+
+/* Application */
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--background-dark);
+}
+
+/* navbar */
+.navbar {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: var(--background-navbar);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.separator {
+  height: 35px;
+  width: 1px;
+  background: var(--border-color);
+}
+
+.logo {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--institutional-blue);
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar button {
+  font-family: var(--font-body);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.login-button {
+  padding: 10px 18px;
+  background: transparent;
+  border: none;
+  color: var(--text-dark);
+}
+
+.register-button {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--institutional-blue);
+  border-radius: 4px;
+  color: var(--institutional-blue);
+}
+
+.login-button:hover {
+  text-decoration: underline;
+}
+
+.register-button:hover {
+  background: #f2f4f8;
+}
+
+/* Écran de chargement */
+.loader-screen {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--background-navbar);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f2f4f8;
+  border-top: 4px solid var(--institutional-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loader-text {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* carte */
+.map-container {
+  height: calc(100vh - 80px);
+  width: 100%;
+}
+
+.fake-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      25deg,
+      transparent 48%,
+      #343434 49%,
+      #343434 51%,
+      transparent 52%
+    ),
+    linear-gradient(
+      -30deg,
+      transparent 48%,
+      #292929 49%,
+      #292929 51%,
+      transparent 52%
+    ),
+    #191919;
+}
+
+.map-label {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.marker {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: var(--marker-color);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.marker-1 { top: 30%; left: 35%; }
+.marker-2 { top: 60%; left: 50%; }
+.marker-3 { top: 40%; left: 70%; }
+.marker-4 { top: 70%; left: 25%; }
+
+button:focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 3px;
+}
+
+/* Modal centré et adaptative) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--background-navbar);
+  padding: 28px 32px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--text-dark);
+  position: relative;
+  font-family: var(--font-body);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  font-family: var(--font-title);
+  color: var(--institutional-blue);
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+}
+
+.close-btn:hover {
+  color: var(--marker-color);
+}
+
+.role-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.role-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  background: #f9f9f9;
+  cursor: pointer;
+  font-family: var(--font-title);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.role-tabs button.active {
+  background: transparent;
+  color: var(--institutional-blue);
+  border: 2px solid var(--institutional-blue);
+  font-weight: bold;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 6px;
+}
+
+.input-group label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+.input-group input {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.input-group input:focus {
+  outline: 2px solid var(--institutional-blue);
+  border-color: transparent;
+}
+.submit-btn {
+  margin-top: 8px;
+  padding: 12px;
+  background: transparent;
+  color: var(--institutional-blue);
+  border: 2px solid var(--institutional-blue);
+  border-radius: 4px;
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: rgba(27, 58, 107, 0.05); /* léger voile bleu au survol*/
+}
+
+.divider {
+  margin: 20px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  position: relative;
+  font-family: var(--font-title);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-btn:hover {
+  background: #f2f4f8;
+}
+
+/* DRAPEAU + MINISTÈRE) */
+.bloc-marque {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.drapeau {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08); 
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ministere {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-dark);
+  text-align: left;
+}
+
+.ministere span {
+  display: block;
+}
+
+/* responsive */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 16px;
+  }
+  .ministere {
+    font-size: 9px;
+  }
+  .logo {
+    font-size: 20px;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+}
