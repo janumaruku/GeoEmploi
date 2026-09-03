@@ -42,7 +42,7 @@ function App() {
             </div>
           </div>
            <div className="separator"></div>
-          <h1 className="logo">ChomageGo</h1>
+          <h1 className="logo">GéoEmploi</h1>
           <div className="loader-spinner"></div>
           <p className="loader-text">Chargement des données géolocalisées...</p>
         </div>
@@ -67,7 +67,7 @@ function App() {
             </div>
           </div>
           <div className="separator"></div>
-          <h1 className="logo">ChomageGo</h1>
+          <h1 className="logo">GéoEmploi</h1>
         </div>
 
         <nav className="navbar-right">
