@@ -1,8 +1,48 @@
+/* Marianne (Corps de texte ou Titres) */
+@font-face {
+  font-family: "Marianne";
+  src: url("/fonts/Marianne_2022/fontes%20web/Marianne-Regular.woff2") format("woff2"),
+       url("/fonts/Marianne_2022/fontes%20web/Marianne-Regular.woff") format("woff"),
+       url("/fonts/Marianne_2022/fontes%20desktop/TTF/Marianne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Marianne Bold ( pour les titres h1, h2) */
+@font-face {
+  font-family: "Marianne";
+  src: url("/fonts/Marianne_2022/fontes%20web/Marianne-Bold.woff2") format("woff2"),
+       url("/fonts/Marianne_2022/fontes%20web/Marianne-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Spectral*/
+@font-face {
+  font-family: "Spectral";
+  src: url("/fonts/Spectral_v2.001/Spectral-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Spectral */
+@font-face {
+  font-family: "Spectral";
+  src: url("/fonts/Spectral_v2.001/Spectral-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 :root {
+
   --institutional-blue: #1B3A6B;
 
   --background-dark: #121212;
