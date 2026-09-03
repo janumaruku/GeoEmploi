@@ -11,8 +11,6 @@ import StatusMessage from './components/StatusMessage.jsx'
 import { distanceInKm } from './utils/distance.js'
 
 const normalizeText = (value) => value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-const hasCoordinates = (offer) => Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude))
-
 const applicationErrorMessage = (error) => {
   if (error.status === 409) return 'Vous avez déjà candidaté à cette offre.'
   if (error.status === 403) return 'Seul un compte candidat peut envoyer une candidature.'
@@ -39,10 +37,9 @@ function App() {
 
   useEffect(() => {
     getOffers().then((data) => {
-      const validOffers = data.filter(hasCoordinates)
-      setOffers(validOffers)
-      setSelectedOffer(validOffers[0] ?? null)
-      setLoadState(validOffers.length ? 'success' : 'empty')
+      setOffers(data)
+      setSelectedOffer(data[0] ?? null)
+      setLoadState(data.length ? 'success' : 'empty')
     }).catch(() => setLoadState('error'))
   }, [])
 
@@ -61,9 +58,10 @@ function App() {
     return result
   }, [activeQuery, offers, userLocation])
 
+  const firstMappableOffer = visibleOffers.find((offer) => Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude)))
   const mapCenter = userLocation
     ? [userLocation.latitude, userLocation.longitude]
-    : visibleOffers[0] ? [Number(visibleOffers[0].latitude), Number(visibleOffers[0].longitude)] : null
+    : activeQuery && firstMappableOffer ? [Number(firstMappableOffer.latitude), Number(firstMappableOffer.longitude)] : null
 
   const closeLogin = useCallback(() => {
     if (!isLoggingIn) { setIsLoginOpen(false); setLoginError(''); setPendingOffer(null) }
@@ -171,7 +169,7 @@ function App() {
           </div>
           {loadState !== 'success' ? <div className="map-shell"><StatusMessage type={loadState} /></div>
             : visibleOffers.length === 0 ? <div className="map-shell"><StatusMessage type="search-empty" /></div>
-              : <div className="map-shell"><MapView offers={visibleOffers} selectedOfferId={selectedOffer?.id} onSelectOffer={selectOffer} center={mapCenter} userLocation={userLocation} /></div>}
+              : <div className="map-shell"><MapView offers={visibleOffers} selectedOfferId={selectedOffer?.id} onSelectOffer={selectOffer} center={mapCenter} userLocation={userLocation} fitOffers={Boolean(activeQuery)} /></div>}
         </section>
         <aside className="offer-panel" aria-label="Détail de l’offre sélectionnée">
           <OfferCard offer={selectedOffer} onApply={handleApply} applicationState={applicationState} />
