@@ -25,15 +25,35 @@ sudo systemctl start postgresql
 
 ## 2. Créer la base de données
 
-Connecte-toi à Postgres :
+**Sur Ubuntu/Debian**, l'authentification `peer` par défaut refuse `psql -U postgres`
+tant que tu n'es pas connecté sous l'utilisateur système `postgres` — c'est normal, pas
+une erreur d'install. Passe par :
 ```bash
-psql -U postgres
+sudo -u postgres psql
 ```
-Puis dans le prompt `psql` :
+
+Dans le prompt `psql` :
 ```sql
+ALTER USER postgres PASSWORD 'postgres';
 CREATE DATABASE geoemploi;
 ```
 `\q` pour sortir.
+
+**Vérifie le port réel de ton cluster** avant de continuer — s'il y a déjà un Postgres
+qui tourne sur ta machine (natif ou dans un conteneur Docker d'un autre projet), l'install
+apt peut avoir démarré sur un port différent de `5432` :
+```bash
+pg_lsclusters
+```
+Note le port affiché. Si ce n'est pas `5432`, tu en auras besoin à l'étape suivante.
+
+Pour te reconnecter ensuite sans `sudo`, avec mot de passe :
+```bash
+sudo -u postgres psql -c "SHOW hba_file;"   # trouve le chemin de pg_hba.conf
+sudo nano <chemin_affiché>                   # change la ligne "local all postgres peer" en "... md5"
+sudo systemctl restart postgresql
+psql -U postgres -h localhost -p <ton_port> -d geoemploi   # -h force l'auth par mot de passe
+```
 
 ## 3. Installer le projet
 
@@ -50,13 +70,19 @@ chmod +x install.sh start.sh
 cp .env.example .env
 ```
 
-Ouvre `.env` et mets tes vrais identifiants Postgres :
+Ouvre `.env` et mets tes vrais identifiants Postgres, **avec le port noté à l'étape 2**
+(`5432` si rien d'autre ne tournait déjà, sinon celui que `pg_lsclusters` t'a donné) :
 ```
-DATABASE_URL=postgresql://<user>:<password>@localhost:5432/geoemploi
+DATABASE_URL=postgresql://<user>:<password>@localhost:<port>/geoemploi
 SECRET_KEY=<une_valeur_aleatoire>
 ```
 
-Si t'as gardé `postgres`/`postgres` comme user/password par défaut à l'install, le `.env.example` fonctionne tel quel.
+`SECRET_KEY` signe les tokens JWT (voir section Auth plus bas) — génère-en une vraie avant de partager le projet :
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Si t'as gardé `postgres`/`postgres` comme user/password par défaut à l'install, le `.env.example` fonctionne tel quel pour `DATABASE_URL`.
 
 ## 5. Lancer les migrations
 
@@ -110,8 +136,8 @@ app/
 ├── main.py                  # point d'entrée FastAPI
 ├── core/
 │   ├── config.py             # lecture de .env
-│   ├── security.py           # hash de mot de passe
-│   └── deps.py                # auth (stub) + vérification de rôle
+│   ├── security.py           # hash de mot de passe + génération/vérification JWT
+│   └── deps.py                # auth JWT + vérification de rôle
 ├── db/
 │   ├── base.py                 # Base SQLAlchemy
 │   └── session.py              # connexion DB
@@ -125,12 +151,14 @@ app/
 ├── schemas/                  # validation Pydantic entrée/sortie API
 ├── crud/                     # logique d'accès DB
 └── api/v1/                   # routes HTTP
+    ├── auth.py                  # POST /auth/login
     ├── users.py                # POST/GET/PUT/DELETE /users, PATCH status
     ├── offers.py                # CRUD offres + modération
     ├── applications.py          # candidatures (ressource plate, filtrée)
     └── admin.py                  # métriques nationales uniquement
 
 migrations/                  # Alembic
+scripts/                     # seed.py, communes.py (peuplement de test)
 requirements.txt
 install.sh / start.sh
 ```
@@ -156,21 +184,34 @@ Il n'existe pas de namespace `/admin/offers`, `/admin/users` séparé. Les même
 Exception : `/admin/metrics`, qui n'est pas un CRUD sur une ressource existante mais un
 endpoint d'agrégation propre à l'admin.
 
-## Auth : stub à remplacer
+## Auth : JWT (Bearer token)
 
-`core/deps.get_current_user` lit un header `X-User-Id` en clair pour identifier
-l'utilisateur appelant — ça permet de tester les routes protégées sans construire tout
-de suite le vrai système de token. **À remplacer par du JWT avant toute mise en prod.**
+`POST /api/v1/auth/login` prend `username` (l'email) et `password` en `form-data`
+(pas JSON — c'est le format standard OAuth2, ça branche automatiquement le bouton
+"Authorize" de Swagger UI sur `/docs`), et renvoie :
+```json
+{"access_token": "...", "token_type": "bearer"}
+```
 
-Exemple d'appel authentifié en attendant :
+Toutes les routes protégées attendent ensuite `Authorization: Bearer <token>`.
+Le token expire après `ACCESS_TOKEN_EXPIRE_MINUTES` (60 par défaut, configurable dans `.env`).
+
+Exemple complet :
 ```bash
-curl -X GET http://localhost:8000/api/v1/users/1 -H "X-User-Id: 1"
+# login
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -d "username=danny@test.com&password=motdepasse123"
+
+# utiliser le token reçu
+curl http://localhost:8000/api/v1/users/1 \
+  -H "Authorization: Bearer <token_reçu>"
 ```
 
 ## Prochaines étapes possibles
 
 - Géolocalisation : le sujet impose l'usage des flux IGN / API Adresse (pas de fournisseur
   tiers type OpenStreetMap) pour tout géocodage — module séparé, pas encore branché ici.
-- Vrai système d'auth JWT à la place du stub `X-User-Id`.
 - Dashboard employeur (`GET /users/{id}/dashboard`) et tableau de bord métriques admin
   détaillé, au-delà des compteurs bruts actuels dans `/admin/metrics`.
+- Rafraîchissement de token (refresh token) — pour l'instant, le token expiré oblige
+  simplement à se reconnecter.

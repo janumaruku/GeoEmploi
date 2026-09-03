@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     app_version: str = "0.1.0"
 
+    # JWT
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+
     class Config:
         env_file = ".env"
 

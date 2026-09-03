@@ -1,21 +1,33 @@
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.core.security import decode_access_token
 from app.models.user import User, UserRole
 
-# NOTE: stub temporaire tant qu'il n'y a pas de vrai système de token (JWT).
-# Permet de tester les routes protégées en passant l'id du user appelant
-# dans le header X-User-Id. À remplacer avant toute mise en production.
+# tokenUrl pointe vers l'endpoint de login : c'est ce qui branche le
+# bouton "Authorize" de Swagger UI (/docs).
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 def get_current_user(
-    x_user_id: int = Header(..., alias="X-User-Id"),
+    token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    user = db.query(User).filter(User.id == x_user_id).first()
+    credentials_error = HTTPException(
+        status.HTTP_401_UNAUTHORIZED,
+        "Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    user_id = decode_access_token(token)
+    if user_id is None:
+        raise credentials_error
+
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not found")
+        raise credentials_error
     return user
 
 
