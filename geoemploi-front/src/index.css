@@ -11,4 +11,13 @@ body,
 
 body {
   min-width: 320px;
+  background: #f4f6f8;
+  color: #161616;
+  font-family: "Spectral", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+button,
+input { font: inherit; }
+
+button { touch-action: manipulation; }
