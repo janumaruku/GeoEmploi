@@ -25,15 +25,35 @@ sudo systemctl start postgresql
 
 ## 2. Créer la base de données
 
-Connecte-toi à Postgres :
+**Sur Ubuntu/Debian**, l'authentification `peer` par défaut refuse `psql -U postgres`
+tant que tu n'es pas connecté sous l'utilisateur système `postgres` — c'est normal, pas
+une erreur d'install. Passe par :
 ```bash
-psql -U postgres
+sudo -u postgres psql
 ```
-Puis dans le prompt `psql` :
+
+Dans le prompt `psql` :
 ```sql
+ALTER USER postgres PASSWORD 'postgres';
 CREATE DATABASE geoemploi;
 ```
 `\q` pour sortir.
+
+**Vérifie le port réel de ton cluster** avant de continuer — s'il y a déjà un Postgres
+qui tourne sur ta machine (natif ou dans un conteneur Docker d'un autre projet), l'install
+apt peut avoir démarré sur un port différent de `5432` :
+```bash
+pg_lsclusters
+```
+Note le port affiché. Si ce n'est pas `5432`, tu en auras besoin à l'étape suivante.
+
+Pour te reconnecter ensuite sans `sudo`, avec mot de passe :
+```bash
+sudo -u postgres psql -c "SHOW hba_file;"   # trouve le chemin de pg_hba.conf
+sudo nano <chemin_affiché>                   # change la ligne "local all postgres peer" en "... md5"
+sudo systemctl restart postgresql
+psql -U postgres -h localhost -p <ton_port> -d geoemploi   # -h force l'auth par mot de passe
+```
 
 ## 3. Installer le projet
 
@@ -50,9 +70,10 @@ chmod +x install.sh start.sh
 cp .env.example .env
 ```
 
-Ouvre `.env` et mets tes vrais identifiants Postgres :
+Ouvre `.env` et mets tes vrais identifiants Postgres, **avec le port noté à l'étape 2**
+(`5432` si rien d'autre ne tournait déjà, sinon celui que `pg_lsclusters` t'a donné) :
 ```
-DATABASE_URL=postgresql://<user>:<password>@localhost:5432/geoemploi
+DATABASE_URL=postgresql://<user>:<password>@localhost:<port>/geoemploi
 SECRET_KEY=<une_valeur_aleatoire>
 ```
 
