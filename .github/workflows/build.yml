@@ -91,7 +91,7 @@ jobs:
           # Frontend production bundle
           cp -r geoemploi-front/dist/* build/frontend/
           # Documentation
-          cp DEMO_ACCOUNTS.md build/
+          cp DEMO_ACCOUNTS.md build/ 2>/dev/null || true
           cp README.md build/ 2>/dev/null || true
 
       - name: Upload build artifact
