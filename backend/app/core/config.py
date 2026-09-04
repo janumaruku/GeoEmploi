@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
+    # Cartographie : le navigateur passe exclusivement par le proxy GéoEmploi.
+    ign_wmts_base_url: str = "https://data.geopf.fr/wmts"
+    ign_wmts_layer: str = "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2"
+    ign_wmts_timeout_seconds: float = 8.0
+    map_cache_dir: str = "/tmp/geoemploi-map-cache"
+
     class Config:
         env_file = ".env"
 
