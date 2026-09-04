@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { login, registerUser } from './api/auth.js'
+import { login, logout as apiLogout, registerUser } from './api/auth.js'
+import { getToken, setToken as storeToken } from './api/authToken.js'
 import { getOffers } from './api/offers.js'
 import LoginModal from './components/LoginModal.jsx'
 import MapView from './components/MapView.jsx'
@@ -17,7 +18,7 @@ function App() {
   const [loadState, setLoadState] = useState('loading')
   const [query, setQuery] = useState('')
   const [activeQuery, setActiveQuery] = useState('')
-  const [token, setToken] = useState(() => sessionStorage.getItem('geoemploi_token'))
+  const [token, setToken] = useState(() => getToken())
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -60,7 +61,7 @@ function App() {
     setLoginError('')
     try {
       const result = await login(email, password)
-      sessionStorage.setItem('geoemploi_token', result.access_token)
+      storeToken(result.access_token)
       setToken(result.access_token)
       setIsLoginOpen(false)
     } catch {
@@ -87,7 +88,7 @@ function App() {
   }
 
   const logout = () => {
-    sessionStorage.removeItem('geoemploi_token')
+    apiLogout()
     setToken(null)
   }
 

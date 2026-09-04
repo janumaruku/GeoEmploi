@@ -2,6 +2,34 @@
 
 API REST pour la plateforme de recherche d'emploi géolocalisée. FastAPI + PostgreSQL + Alembic.
 
+## Tu as déjà tout installé ? Relancer le projet un autre jour
+
+Si t'as déjà fait les étapes 1 à 5 une fois (Postgres installé, base créée, migrations
+appliquées), tu n'as **pas besoin de tout refaire**. Deux choses à vérifier, dans l'ordre :
+
+1. **Postgres tourne-t-il ?** Sur Ubuntu, le service démarre automatiquement au boot de la
+   machine (activé par défaut à l'install apt) — tu n'as normalement rien à faire. Pour
+   vérifier :
+   ```bash
+   sudo systemctl status postgresql
+   ```
+   Si tu vois `inactive` ou `dead`, relance-le : `sudo systemctl start postgresql`.
+2. **Lance l'API** :
+   ```bash
+   ./start.sh
+   ```
+
+C'est tout. Pas besoin de refaire `install.sh`, pas besoin de rejouer les migrations, pas
+besoin de recréer la base — tout ça ne se fait qu'une fois. `start.sh` se contente de
+démarrer le serveur FastAPI, qui se connecte à la base déjà existante via l'URL dans `.env`.
+
+**Si `./start.sh` échoue avec une erreur de connexion DB** : c'est presque toujours que
+Postgres n'est pas lancé (`systemctl status` ci-dessus) ou que le port dans `.env` ne
+correspond plus au port réel de ton cluster (`pg_lsclusters` pour vérifier).
+
+Le reste de ce README (étapes 1 à 7) ne sert que pour une **première installation**, ou si
+tu changes de machine.
+
 ## Prérequis
 
 - Python 3.11+

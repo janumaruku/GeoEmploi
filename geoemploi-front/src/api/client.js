@@ -1,3 +1,5 @@
+import { getToken } from './authToken.js'
+
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/$/, '')
 
 export class ApiError extends Error {
@@ -9,9 +11,16 @@ export class ApiError extends Error {
 }
 
 export async function apiRequest(path, options = {}) {
+  // Attache le Bearer token automatiquement s'il existe — inutile de le
+  // répéter dans chaque appel. Les endpoints publics (GET /offers, POST
+  // /auth/login...) ignorent simplement ce header en trop.
+  const token = getToken()
+  const headers = { ...(options.headers || {}) }
+  if (token && !headers.Authorization) headers.Authorization = `Bearer ${token}`
+
   let response
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, options)
+    response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
   } catch {
     throw new ApiError('Le service est momentanément indisponible. Vérifiez que le backend est démarré.')
   }
