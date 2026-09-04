@@ -22,3 +22,8 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# Python generated files
+__pycache__/
+*.pyc
+/backend/lib/

@@ -18,9 +18,6 @@ export function registerUser(data) {
   })
 }
 
-// Purement local : le backend n'a pas de révocation de token (pas de
-// blacklist/refresh token pour l'instant), donc "se déconnecter" ne fait
-// qu'oublier le token côté client — il reste valide jusqu'à expiration.
 export function logout() {
   clearToken()
 }
