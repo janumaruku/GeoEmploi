@@ -56,7 +56,6 @@
 .map-shell { position: relative; flex: 1; min-height: 350px; overflow: hidden; border: 1px solid #ccd5d6; border-radius: 4px; background: #eef1f3; box-shadow: 0 8px 24px rgb(27 58 107 / 9%); }
 .leaflet-map { width: 100%; height: 100%; min-height: 350px; font-family: var(--font-body); }
 .leaflet-offer-marker { display: grid; place-items: center; width: 34px; height: 34px; border: 3px solid #fff; border-radius: 50% 50% 50% 5px; background: var(--accent); color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / 35%); rotate: -45deg; font: 800 12px var(--font-title); }
-.leaflet-offer-marker b { rotate: 45deg; }
 .leaflet-offer-marker.is-selected { width: 39px; height: 39px; background: var(--blue); }
 .tile-error { position: absolute; z-index: 1000; left: 50%; top: 12px; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 9px 12px; transform: translateX(-50%); border: 1px solid #e5b8b6; border-radius: 3px; background: rgb(255 247 247 / 95%); color: #8f1d19; font-size: 13px; text-align: center; }
 .unlocated-offers { position: absolute; z-index: 900; right: 12px; bottom: 25px; max-width: 230px; padding: 10px; border: 1px solid var(--line); border-radius: 3px; background: rgb(255 255 255 / 95%); box-shadow: 0 3px 12px rgb(0 0 0 / 15%); }
@@ -77,6 +76,15 @@
 .offer-details div { display: grid; grid-template-columns: 28px 72px 1fr; align-items: center; gap: 4px; margin: 9px 0; }
 .offer-details dt { color: var(--muted); font-size: 13px; }.offer-details dd { margin: 0; font-size: 14px; font-weight: 700; }.detail-icon { color: var(--blue); font: 800 16px var(--font-title); }
 .offer-section { margin-top: 24px; }.offer-section h3 { margin: 0 0 9px; font: 800 16px var(--font-title); }.offer-section p { margin: 0; color: #454a50; font-size: 15px; line-height: 1.6; }
+.offer-section h4 { margin: 18px 0 8px; font: 700 14px var(--font-title); }
+.offer-missions { margin: 0; padding-left: 20px; color: #454a50; font-size: 15px; line-height: 1.55; }
+.offer-missions li + li { margin-top: 6px; }
+.apply-button { width: 100%; min-height: 46px; margin-top: 24px; border: 2px solid var(--blue); border-radius: 3px; background: #fff; color: var(--blue); font-family: var(--font-title); font-weight: 800; cursor: pointer; }
+.apply-button:hover { background: #edf1f7; }
+.apply-auth { margin-top: 12px; padding: 12px; border-left: 3px solid var(--blue); background: #f1f4f8; }
+.apply-auth p { margin: 0 0 10px; font-size: 14px; }
+.apply-auth div { display: flex; gap: 8px; }
+.apply-auth button { min-height: 40px; flex: 1; border: 1px solid var(--blue); background: #fff; color: var(--blue); font-weight: 700; cursor: pointer; }
 .status-message { min-height: 360px; display: grid; place-content: center; justify-items: center; padding: 30px; text-align: center; }.status-icon { display: grid; place-items: center; width: 46px; height: 46px; border: 2px solid var(--blue); border-radius: 50%; color: var(--blue); font: 800 22px var(--font-title); }.status-message h2 { margin: 18px 0 8px; font: 800 21px var(--font-title); }.status-message p { max-width: 280px; margin: 0; color: var(--muted); line-height: 1.5; }.status-loading .status-icon { animation: spin 1.2s linear infinite; }.status-error .status-icon { border-color: #b8292f; color: #b8292f; }
 @keyframes spin { to { transform: rotate(360deg); } }
 

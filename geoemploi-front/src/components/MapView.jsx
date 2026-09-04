@@ -17,9 +17,9 @@ function RecenterMap({ offers, fitOffers }) {
   return null
 }
 
-const offerIcon = (number, selected) => divIcon({
+const offerIcon = (selected) => divIcon({
   className: '',
-  html: `<span class="leaflet-offer-marker${selected ? ' is-selected' : ''}"><b>${number}</b></span>`,
+  html: `<span class="leaflet-offer-marker${selected ? ' is-selected' : ''}" aria-hidden="true"></span>`,
   iconSize: [38, 46],
   iconAnchor: [19, 43],
 })
@@ -61,8 +61,8 @@ function MapView({ offers, selectedOfferId, onSelectOffer, fitOffers }) {
       <MapContainer className="leaflet-map" center={PARIS} zoom={11} scrollWheelZoom>
         <TileLayer url={tileUrl} attribution="&copy; IGN Géoplateforme" eventHandlers={{ tileerror: () => setTileError(true), tileload: () => setTileError(false) }} />
         <RecenterMap offers={mappableOffers} fitOffers={fitOffers} />
-        {mappableOffers.map((offer, index) => (
-          <Marker key={offer.id} position={[Number(offer.latitude), Number(offer.longitude)]} icon={offerIcon(index + 1, offer.id === selectedOfferId)} eventHandlers={{ click: () => onSelectOffer(offer) }} title={offer.title} />
+        {mappableOffers.map((offer) => (
+          <Marker key={offer.id} position={[Number(offer.latitude), Number(offer.longitude)]} icon={offerIcon(offer.id === selectedOfferId)} eventHandlers={{ click: () => onSelectOffer(offer) }} title={offer.title} />
         ))}
       </MapContainer>
       {tileError && <p className="tile-error" role="status">Le fond cartographique est momentanément indisponible. Les offres restent consultables.</p>}

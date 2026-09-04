@@ -1,21 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import './App.css'
 import { login, logout as apiLogout, registerUser } from './api/auth.js'
 import { getToken, setToken as storeToken } from './api/authToken.js'
-import { getOffers } from './api/offers.js'
 import LoginModal from './components/LoginModal.jsx'
 import MapView from './components/MapView.jsx'
 import OfferCard from './components/OfferCard.jsx'
 import RegisterModal from './components/RegisterModal.jsx'
 import SearchLocation from './components/SearchLocation.jsx'
 import StatusMessage from './components/StatusMessage.jsx'
+import { demoOffers } from './data/demoOffers.js'
 
 const normalizeText = (value) => value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 function App() {
-  const [offers, setOffers] = useState([])
-  const [selectedOffer, setSelectedOffer] = useState(null)
-  const [loadState, setLoadState] = useState('loading')
+  const [selectedOffer, setSelectedOffer] = useState(demoOffers[0])
   const [query, setQuery] = useState('')
   const [activeQuery, setActiveQuery] = useState('')
   const [token, setToken] = useState(() => getToken())
@@ -25,19 +23,11 @@ function App() {
   const [loginError, setLoginError] = useState('')
   const [registrationMessage, setRegistrationMessage] = useState(null)
 
-  useEffect(() => {
-    getOffers().then((data) => {
-      setOffers(data)
-      setSelectedOffer(data[0] || null)
-      setLoadState(data.length ? 'success' : 'empty')
-    }).catch(() => setLoadState('error'))
-  }, [])
-
   const visibleOffers = useMemo(() => {
-    if (!activeQuery) return offers
+    if (!activeQuery) return demoOffers
     const searched = normalizeText(activeQuery)
-    return offers.filter((offer) => normalizeText(offer.address || '').includes(searched))
-  }, [activeQuery, offers])
+    return demoOffers.filter((offer) => normalizeText(offer.address).includes(searched))
+  }, [activeQuery])
 
   const closeLogin = useCallback(() => {
     if (!isSubmitting) { setIsLoginOpen(false); setLoginError('') }
@@ -46,14 +36,14 @@ function App() {
   const handleSearch = () => {
     const cleanedQuery = query.trim().replace(/\s+/g, ' ')
     setActiveQuery(cleanedQuery)
-    const firstMatch = offers.find((offer) => normalizeText(offer.address || '').includes(normalizeText(cleanedQuery)))
+    const firstMatch = demoOffers.find((offer) => normalizeText(offer.address).includes(normalizeText(cleanedQuery)))
     setSelectedOffer(firstMatch || null)
   }
 
   const clearSearch = () => {
     setQuery('')
     setActiveQuery('')
-    setSelectedOffer(offers[0] || null)
+    setSelectedOffer(demoOffers[0])
   }
 
   const handleLogin = async ({ email, password }) => {
@@ -112,13 +102,19 @@ function App() {
             <SearchLocation query={query} onQueryChange={setQuery} onSearch={handleSearch} onClear={clearSearch} />
             <div className="map-heading">
               <div><p className="eyebrow">Offres géolocalisées</p><h2 id="map-title">{activeQuery ? `Offres à ${activeQuery}` : 'Rechercher des offres'}</h2></div>
-              {loadState === 'success' && <p className="result-count"><strong>{visibleOffers.length}</strong> offre{visibleOffers.length !== 1 ? 's' : ''}</p>}
+              <p className="result-count"><strong>{visibleOffers.length}</strong> offre{visibleOffers.length !== 1 ? 's' : ''}</p>
             </div>
-            {loadState !== 'success' ? <div className="map-shell"><StatusMessage type={loadState} /></div>
-              : visibleOffers.length === 0 ? <div className="map-shell"><StatusMessage type="search-empty" /></div>
-                : <div className="map-shell"><MapView offers={visibleOffers} selectedOfferId={selectedOffer?.id} onSelectOffer={setSelectedOffer} fitOffers={Boolean(activeQuery)} /></div>}
+            {visibleOffers.length === 0 ? <div className="map-shell"><StatusMessage type="search-empty" /></div>
+              : <div className="map-shell"><MapView offers={visibleOffers} selectedOfferId={selectedOffer?.id} onSelectOffer={setSelectedOffer} fitOffers={Boolean(activeQuery)} /></div>}
           </section>
-          <aside className="offer-panel" aria-label="Détail de l’offre sélectionnée"><OfferCard offer={selectedOffer} /></aside>
+          <aside className="offer-panel" aria-label="Détail de l’offre sélectionnée">
+            <OfferCard
+              offer={selectedOffer}
+              isAuthenticated={Boolean(token)}
+              onLogin={() => setIsLoginOpen(true)}
+              onRegister={() => { setRegistrationMessage(null); setIsRegisterOpen(true) }}
+            />
+          </aside>
         </div>
       </main>
 
