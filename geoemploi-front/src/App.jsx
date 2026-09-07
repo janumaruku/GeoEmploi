@@ -28,6 +28,9 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [registrationMessage, setRegistrationMessage] = useState(null)
+  const [userLocation, setUserLocation] = useState(null)
+  const [geolocationLoading, setGeolocationLoading] = useState(false)
+  const [geolocationMessage, setGeolocationMessage] = useState('')
 
   const searchedCity = normalizeText(activeQuery)
   const visibleOffers = activeQuery
@@ -54,6 +57,45 @@ function App() {
     setQuery('')
     setActiveQuery('')
     setSelectedOffer(demoOffers[0])
+  }
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setGeolocationMessage('La géolocalisation n’est pas disponible. Vous pouvez rechercher une commune manuellement.')
+      return
+    }
+
+    setGeolocationLoading(true)
+    setGeolocationMessage('Recherche de votre position…')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        setGeolocationLoading(false)
+        setGeolocationMessage('Position trouvée. Votre position n’est pas enregistrée.')
+      },
+      (error) => {
+        setGeolocationLoading(false)
+
+        if (error.code === error.PERMISSION_DENIED) {
+          setGeolocationMessage('La géolocalisation a été refusée. Vous pouvez rechercher une commune manuellement.')
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setGeolocationMessage('Votre position est indisponible. Vous pouvez rechercher une commune manuellement.')
+        } else if (error.code === error.TIMEOUT) {
+          setGeolocationMessage('La recherche de votre position a expiré. Vous pouvez réessayer.')
+        } else {
+          setGeolocationMessage('Impossible de récupérer votre position. Vous pouvez rechercher une commune manuellement.')
+        }
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 60000,
+      },
+    )
   }
 
   const handleLogin = async ({ email, password }) => {
@@ -128,7 +170,15 @@ function App() {
       <main>
         <div className="workspace">
           <section className="map-section" aria-labelledby="map-title">
-            <SearchLocation query={query} onQueryChange={setQuery} onSearch={handleSearch} onClear={clearSearch} />
+            <SearchLocation
+              query={query}
+              onQueryChange={setQuery}
+              onSearch={handleSearch}
+              onClear={clearSearch}
+              onUseLocation={useMyLocation}
+              geolocationLoading={geolocationLoading}
+              geolocationMessage={geolocationMessage}
+            />
             <div className="map-heading">
               <div>
                 <p className="eyebrow">Offres géolocalisées</p>
@@ -147,6 +197,7 @@ function App() {
                   selectedOfferId={selectedOffer?.id}
                   onSelectOffer={setSelectedOffer}
                   fitOffers={Boolean(activeQuery)}
+                  userLocation={userLocation}
                 />
               )}
             </div>
