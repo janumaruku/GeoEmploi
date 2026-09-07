@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { divIcon } from 'leaflet'
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -10,9 +10,16 @@ function RecenterMap({ offers, fitOffers }) {
   const map = useMap()
   useEffect(() => {
     const positions = offers.map((offer) => [Number(offer.latitude), Number(offer.longitude)])
-    if (positions.length > 1) map.fitBounds(positions, { padding: [35, 35], maxZoom: fitOffers ? 13 : 6 })
-    else if (positions.length === 1) map.setView(positions[0], 13)
-    else map.setView(PARIS, 11)
+    if (positions.length > 1) {
+      map.fitBounds(positions, {
+        padding: [35, 35],
+        maxZoom: fitOffers ? 13 : 6,
+      })
+    } else if (positions.length === 1) {
+      map.setView(positions[0], 13)
+    } else {
+      map.setView(PARIS, 11)
+    }
   }, [fitOffers, map, offers])
   return null
 }
@@ -45,16 +52,22 @@ function OffersFallback({ offers, selectedOfferId, onSelectOffer }) {
 
 function MapView({ offers, selectedOfferId, onSelectOffer, fitOffers }) {
   const [tileError, setTileError] = useState(false)
-  const mappableOffers = useMemo(
-    () => offers.filter((offer) => Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude))),
-    [offers],
-  )
-  const unlocatedOffers = useMemo(
-    () => offers.filter((offer) => !Number.isFinite(Number(offer.latitude)) || !Number.isFinite(Number(offer.longitude))),
-    [offers],
-  )
+  const hasCoordinates = (offer) => {
+    return Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude))
+  }
 
-  if (!tileUrl) return <OffersFallback offers={offers} selectedOfferId={selectedOfferId} onSelectOffer={onSelectOffer} />
+  const mappableOffers = offers.filter(hasCoordinates)
+  const unlocatedOffers = offers.filter((offer) => !hasCoordinates(offer))
+
+  if (!tileUrl) {
+    return (
+      <OffersFallback
+        offers={offers}
+        selectedOfferId={selectedOfferId}
+        onSelectOffer={onSelectOffer}
+      />
+    )
+  }
 
   return (
     <>

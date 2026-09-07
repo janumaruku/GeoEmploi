@@ -11,9 +11,6 @@ export class ApiError extends Error {
 }
 
 export async function apiRequest(path, options = {}) {
-  // Attache le Bearer token automatiquement s'il existe — inutile de le
-  // répéter dans chaque appel. Les endpoints publics (GET /offers, POST
-  // /auth/login...) ignorent simplement ce header en trop.
   const token = getToken()
   const headers = { ...(options.headers || {}) }
   if (token && !headers.Authorization) headers.Authorization = `Bearer ${token}`
