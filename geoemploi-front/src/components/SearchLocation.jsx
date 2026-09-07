@@ -1,4 +1,14 @@
-function SearchLocation({ query, onQueryChange, onSearch, onClear }) {
+function SearchLocation({
+  query,
+  onQueryChange,
+  onSearch,
+  onClear,
+  onUseLocation,
+  onStopLocation,
+  isUsingLocation,
+  geolocationLoading,
+  geolocationMessage,
+}) {
   function submitSearch(event) {
     event.preventDefault()
     onSearch()
@@ -21,7 +31,15 @@ function SearchLocation({ query, onQueryChange, onSearch, onClear }) {
             Effacer
           </button>
         )}
+        <button type="button" onClick={isUsingLocation ? onStopLocation : onUseLocation} disabled={geolocationLoading}>
+          {geolocationLoading
+            ? 'Localisation en cours...'
+            : isUsingLocation
+              ? 'Arrêter d’utiliser ma position'
+              : 'Utiliser ma position'}
+        </button>
       </div>
+      {geolocationMessage && <p className="geolocation-message" role="status">{geolocationMessage}</p>}
     </form>
   )
 }

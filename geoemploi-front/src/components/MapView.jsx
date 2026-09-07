@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { divIcon } from 'leaflet'
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -6,11 +6,22 @@ import 'leaflet/dist/leaflet.css'
 const PARIS = [48.8566, 2.3522]
 const tileUrl = import.meta.env.VITE_MAP_TILE_URL || '/api/v1/map/tiles/{z}/{x}/{y}'
 
-function RecenterMap({ offers, fitOffers }) {
+function RecenterMap({ offers, fitOffers, userLocation }) {
   const map = useMap()
+  const previousUserLocation = useRef(null)
+
   useEffect(() => {
-    const positions = offers.map((offer) => [Number(offer.latitude), Number(offer.longitude)])
-    if (positions.length > 1) {
+    const locationWasStopped = previousUserLocation.current && !userLocation
+    previousUserLocation.current = userLocation
+
+    if (locationWasStopped) return
+
+    const positions = offers
+      .filter((offer) => Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude)))
+      .map((offer) => [Number(offer.latitude), Number(offer.longitude)])
+    if (userLocation && !fitOffers) {
+      map.setView([userLocation.lat, userLocation.lng], 13)
+    } else if (positions.length > 1) {
       map.fitBounds(positions, {
         padding: [35, 35],
         maxZoom: fitOffers ? 13 : 6,
@@ -20,7 +31,7 @@ function RecenterMap({ offers, fitOffers }) {
     } else {
       map.setView(PARIS, 11)
     }
-  }, [fitOffers, map, offers])
+  }, [fitOffers, map, offers, userLocation])
   return null
 }
 
@@ -29,6 +40,13 @@ const offerIcon = (selected) => divIcon({
   html: `<span class="leaflet-offer-marker${selected ? ' is-selected' : ''}" aria-hidden="true"></span>`,
   iconSize: [38, 46],
   iconAnchor: [19, 43],
+})
+
+const userIcon = divIcon({
+  className: '',
+  html: '<span class="leaflet-user-marker" aria-hidden="true"></span>',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
 })
 
 function OffersFallback({ offers, selectedOfferId, onSelectOffer }) {
@@ -50,7 +68,7 @@ function OffersFallback({ offers, selectedOfferId, onSelectOffer }) {
   )
 }
 
-function MapView({ offers, selectedOfferId, onSelectOffer, fitOffers }) {
+function MapView({ offers, selectedOfferId, onSelectOffer, fitOffers, userLocation }) {
   const [tileError, setTileError] = useState(false)
   const hasCoordinates = (offer) => {
     return Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude))
@@ -73,10 +91,13 @@ function MapView({ offers, selectedOfferId, onSelectOffer, fitOffers }) {
     <>
       <MapContainer className="leaflet-map" center={PARIS} zoom={11} scrollWheelZoom>
         <TileLayer url={tileUrl} attribution="&copy; IGN Géoplateforme" eventHandlers={{ tileerror: () => setTileError(true), tileload: () => setTileError(false) }} />
-        <RecenterMap offers={mappableOffers} fitOffers={fitOffers} />
+        <RecenterMap offers={offers} fitOffers={fitOffers} userLocation={userLocation} />
         {mappableOffers.map((offer) => (
           <Marker key={offer.id} position={[Number(offer.latitude), Number(offer.longitude)]} icon={offerIcon(offer.id === selectedOfferId)} eventHandlers={{ click: () => onSelectOffer(offer) }} title={offer.title} />
         ))}
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} title="Votre position" />
+        )}
       </MapContainer>
       {tileError && <p className="tile-error" role="status">Le fond cartographique est momentanément indisponible. Les offres restent consultables.</p>}
       {unlocatedOffers.length > 0 && (
