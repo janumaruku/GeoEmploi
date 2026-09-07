@@ -101,8 +101,15 @@ function App() {
     <div className="app">
       <header className="navbar">
         <div className="navbar-left">
+          {/* Avant — bloc-marque "Ministère",
           <div className="ministere" aria-label="Ministère du Job et Bonheur"><span>MINISTÈRE</span><span>DU JOB ET BONHEUR</span></div>
           <div className="separator" aria-hidden="true" />
+           */}
+
+          {/* Nouveau :identité neutre, plus de bloc-marque, sans Marianne,
+              sans mention "Ministère". Seul le nom du site, en typographie
+              (police + couleur de marque définies dans App.css : --font-title,
+              --primary). */}
           <h1 className="logo">GéoEmploi</h1>
         </div>
         <nav className="navbar-right" aria-label="Espace personnel">
@@ -178,6 +185,15 @@ function App() {
         isSubmitting={isSubmitting}
         message={registrationMessage}
       />
+
+      {/* il n'existait aucun pied de page ici. (cet élément est un ajout) */}
+      {/* Nouveau :  mention obligatoire, texte exact demandé. Placée à
+          l'intérieur du shell .app, donc affichée sur toutes les pages
+          publiques, y compris les états d'erreur rendus par StatusMessage
+          (SPA sans route d'erreur séparée, voir commentaire dans App.css). */}
+      <footer className="site-footer">
+        Démonstrateur technique, ne constitue pas un service public en exploitation.
+      </footer>
     </div>
   )
 }
