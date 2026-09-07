@@ -1,14 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import { applyToOffer } from './api/applications.js'
 import { login, logout as apiLogout, registerUser } from './api/auth.js'
 import { getToken, setToken as storeToken } from './api/authToken.js'
+import { getOffers } from './api/offers.js'
 import LoginModal from './components/LoginModal.jsx'
 import MapView from './components/MapView.jsx'
 import OfferCard from './components/OfferCard.jsx'
 import RegisterModal from './components/RegisterModal.jsx'
 import SearchLocation from './components/SearchLocation.jsx'
 import StatusMessage from './components/StatusMessage.jsx'
-import { demoOffers } from './data/demoOffers.js'
 
 function normalizeText(value) {
   return value
@@ -19,7 +20,10 @@ function normalizeText(value) {
 }
 
 function App() {
-  const [selectedOffer, setSelectedOffer] = useState(demoOffers[0])
+  const [offers, setOffers] = useState([])
+  const [selectedOffer, setSelectedOffer] = useState(null)
+  const [offersLoading, setOffersLoading] = useState(true)
+  const [offersError, setOffersError] = useState(false)
   const [query, setQuery] = useState('')
   const [activeQuery, setActiveQuery] = useState('')
   const [token, setToken] = useState(() => getToken())
@@ -29,10 +33,34 @@ function App() {
   const [loginError, setLoginError] = useState('')
   const [registrationMessage, setRegistrationMessage] = useState(null)
 
+  useEffect(() => {
+    async function loadOffers() {
+      try {
+        const apiOffers = await getOffers()
+        const formattedOffers = apiOffers.map((offer) => ({
+          ...offer,
+          company: `Employeur n°${offer.employer_id}`,
+          contract: 'Contrat à préciser',
+          description: offer.description || 'La description de cette offre sera bientôt disponible.',
+          missions: ['Prendre connaissance des missions détaillées avec l’employeur.'],
+          profile: 'Le profil recherché sera précisé lors des échanges avec l’employeur.',
+        }))
+        setOffers(formattedOffers)
+        setSelectedOffer(formattedOffers[0] || null)
+      } catch {
+        setOffersError(true)
+      } finally {
+        setOffersLoading(false)
+      }
+    }
+
+    loadOffers()
+  }, [])
+
   const searchedCity = normalizeText(activeQuery)
   const visibleOffers = activeQuery
-    ? demoOffers.filter((offer) => normalizeText(offer.address).includes(searchedCity))
-    : demoOffers
+    ? offers.filter((offer) => normalizeText(offer.address).includes(searchedCity))
+    : offers
 
   function closeLogin() {
     if (isSubmitting) return
@@ -44,7 +72,7 @@ function App() {
     const cleanedQuery = query.trim().replace(/\s+/g, ' ')
     setActiveQuery(cleanedQuery)
     const normalizedQuery = normalizeText(cleanedQuery)
-    const firstMatch = demoOffers.find((offer) => {
+    const firstMatch = offers.find((offer) => {
       return normalizeText(offer.address).includes(normalizedQuery)
     })
     setSelectedOffer(firstMatch || null)
@@ -53,7 +81,7 @@ function App() {
   const clearSearch = () => {
     setQuery('')
     setActiveQuery('')
-    setSelectedOffer(demoOffers[0])
+    setSelectedOffer(offers[0] || null)
   }
 
   const handleLogin = async ({ email, password }) => {
@@ -146,7 +174,11 @@ function App() {
               <p className="result-count"><strong>{visibleOffers.length}</strong> offre{visibleOffers.length !== 1 ? 's' : ''}</p>
             </div>
             <div className="map-shell">
-              {visibleOffers.length === 0 ? (
+              {offersLoading ? (
+                <StatusMessage type="loading" />
+              ) : offersError ? (
+                <StatusMessage type="error" />
+              ) : visibleOffers.length === 0 ? (
                 <StatusMessage type="search-empty" />
               ) : (
                 <MapView
@@ -160,8 +192,10 @@ function App() {
           </section>
           <aside className="offer-panel" aria-label="Détail de l’offre sélectionnée">
             <OfferCard
+              key={selectedOffer?.id || 'empty'}
               offer={selectedOffer}
               isAuthenticated={Boolean(token)}
+              onApply={applyToOffer}
               onLogin={() => setIsLoginOpen(true)}
               onRegister={() => { setRegistrationMessage(null); setIsRegisterOpen(true) }}
             />

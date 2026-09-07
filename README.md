@@ -71,17 +71,37 @@ GeoEmploi/
         └── components/     # carte, formulaires, affichage des offres
 ```
 
-## Ce qui manque encore (à savoir avant de chercher pendant des heures)
+## Données des offres et fond de carte IGN
 
-- **Pas de proxy de tuiles cartographiques côté backend.** Le frontend attend un endpoint
-  `/api/v1/map/tiles/{z}/{x}/{y}` (fond de carte IGN) qui n'existe pas encore côté API —
-  la carte affichera un message "fond cartographique indisponible" tant que ce n'est pas
-  branché. Ce n'est pas un bug de configuration, le module n'est simplement pas encore
-  livré.
-- **Pas de géocodage automatique.** La création d'offre attend `latitude`/`longitude` en
-  entrée directe, pas une adresse convertie automatiquement via l'API Adresse/IGN — la
-  conformité "plus d'OpenStreetMap, uniquement IGN" (exigée par le cabinet) n'est pas
-  encore implémentée côté backend.
+Les marqueurs ne sont pas des offres fournies par IGN. Ils correspondent aux offres de la
+base PostgreSQL, récupérées par le frontend avec `GET /api/v1/offers`. Le script
+`backend/scripts/seed.py` crée 1 000 offres de démonstration par défaut. Il garantit au
+moins une offre dans chacune des 51 communes, puis répartit les offres restantes entre elles.
+
+IGN fournit uniquement le fond cartographique :
+
+1. Leaflet demande une tuile à `/api/v1/map/tiles/{z}/{x}/{y}` ;
+2. le backend transmet la demande au service WMTS de la Géoplateforme IGN ;
+3. la tuile est mise en cache temporairement dans `MAP_CACHE_DIR` ;
+4. les marqueurs d'offres sont ensuite affichés par-dessus le fond IGN.
+
+La configuration par défaut utilise le service WMTS public :
+
+```env
+IGN_WMTS_BASE_URL=https://data.geopf.fr/wmts
+IGN_WMTS_LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2
+IGN_WMTS_TIMEOUT_SECONDS=8
+MAP_CACHE_DIR=/tmp/geoemploi-map-cache
+```
+
+La couche publique `PLANIGNV2` ne nécessite pas de clé API. Il ne faut donc ajouter aucun
+secret au frontend ni committer de clé dans Git. Une clé ne serait nécessaire que pour une
+ressource IGN privée ou à accès restreint ; dans ce cas, elle devrait être ajoutée uniquement
+dans `backend/.env`, jamais dans `geoemploi-front/.env`, puis prise en charge par le proxy.
+
+Il n'y a pas encore de géocodage automatique : lors de la création d'une offre, le backend
+attend toujours une latitude et une longitude. IGN ne crée et ne fournit aucune offre
+d'emploi.
 
 ## Prochaine session : relancer le projet
 

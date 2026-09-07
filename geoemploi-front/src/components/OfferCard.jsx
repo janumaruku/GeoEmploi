@@ -1,13 +1,33 @@
 import { useState } from 'react'
 import StatusMessage from './StatusMessage.jsx'
 
-function OfferCard({ offer, isAuthenticated, onLogin, onRegister }) {
+function OfferCard({ offer, isAuthenticated, onApply, onLogin, onRegister }) {
   const [showAuthChoice, setShowAuthChoice] = useState(false)
+  const [applicationLoading, setApplicationLoading] = useState(false)
+  const [applicationMessage, setApplicationMessage] = useState(null)
 
   if (!offer) return <StatusMessage type="empty" />
 
-  const handleApply = () => {
-    if (!isAuthenticated) setShowAuthChoice(true)
+  const handleApply = async () => {
+    if (!isAuthenticated) {
+      setShowAuthChoice(true)
+      return
+    }
+
+    setApplicationLoading(true)
+    setApplicationMessage(null)
+    try {
+      await onApply(offer.id)
+      setApplicationMessage({ ok: true, text: 'Votre candidature a bien été envoyée.' })
+    } catch (error) {
+      let text = 'Impossible d’envoyer votre candidature pour le moment.'
+      if (error.status === 409) text = 'Vous avez déjà postulé à cette offre.'
+      if (error.status === 403) text = 'Seul un compte candidat peut postuler à une offre.'
+      if (error.status === 401) text = 'Votre session a expiré. Reconnectez-vous pour postuler.'
+      setApplicationMessage({ ok: false, text })
+    } finally {
+      setApplicationLoading(false)
+    }
   }
 
   return (
@@ -37,9 +57,17 @@ function OfferCard({ offer, isAuthenticated, onLogin, onRegister }) {
         </ul>
         <h4>Profil recherché</h4>
         <p>{offer.profile}</p>
-        <button type="button" className="apply-button" onClick={handleApply}>
-          Postuler
+        <button type="button" className="apply-button" onClick={handleApply} disabled={applicationLoading}>
+          {applicationLoading ? 'Envoi en cours…' : 'Postuler'}
         </button>
+        {applicationMessage && (
+          <p
+            className={`application-message ${applicationMessage.ok ? 'is-success' : 'is-error'}`}
+            role="status"
+          >
+            {applicationMessage.text}
+          </p>
+        )}
         {showAuthChoice && !isAuthenticated && (
           <div className="apply-auth" role="status">
             <p>Connectez-vous ou créez un compte pour postuler.</p>
