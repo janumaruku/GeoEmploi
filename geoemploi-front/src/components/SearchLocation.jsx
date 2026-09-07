@@ -4,6 +4,8 @@ function SearchLocation({
   onSearch,
   onClear,
   onUseLocation,
+  onStopLocation,
+  isUsingLocation,
   geolocationLoading,
   geolocationMessage,
 }) {
@@ -29,8 +31,16 @@ function SearchLocation({
             Effacer
           </button>
         )}
-        <button type="button" onClick={onUseLocation} disabled={geolocationLoading}>
-          {geolocationLoading ? 'Localisation…' : 'Utiliser ma position'}
+        <button
+          type="button"
+          onClick={isUsingLocation ? onStopLocation : onUseLocation}
+          disabled={geolocationLoading}
+        >
+          {geolocationLoading
+            ? 'Localisation en cours...'
+            : isUsingLocation
+              ? 'Arrêter d’utiliser ma position'
+              : 'Utiliser ma position'}
         </button>
       </div>
       {geolocationMessage && (

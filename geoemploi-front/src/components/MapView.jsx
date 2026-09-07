@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { divIcon } from 'leaflet'
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -8,7 +8,14 @@ const tileUrl = import.meta.env.VITE_MAP_TILE_URL || '/api/v1/map/tiles/{z}/{x}/
 
 function RecenterMap({ offers, fitOffers, userLocation }) {
   const map = useMap()
+  const previousUserLocation = useRef(null)
+
   useEffect(() => {
+    const locationWasStopped = previousUserLocation.current && !userLocation
+    previousUserLocation.current = userLocation
+
+    if (locationWasStopped) return
+
     const positions = offers
       .filter((offer) => Number.isFinite(Number(offer.latitude)) && Number.isFinite(Number(offer.longitude)))
       .map((offer) => [Number(offer.latitude), Number(offer.longitude)])

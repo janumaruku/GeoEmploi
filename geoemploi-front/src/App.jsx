@@ -75,7 +75,7 @@ function App() {
           lng: position.coords.longitude,
         })
         setGeolocationLoading(false)
-        setGeolocationMessage('Position trouvée. Votre position n’est pas enregistrée.')
+        setGeolocationMessage('Votre position est utilisée uniquement pour cette session et n’est pas enregistrée.')
       },
       (error) => {
         setGeolocationLoading(false)
@@ -96,6 +96,12 @@ function App() {
         maximumAge: 60000,
       },
     )
+  }
+
+  const stopUsingLocation = () => {
+    setUserLocation(null)
+    setGeolocationLoading(false)
+    setGeolocationMessage('')
   }
 
   const handleLogin = async ({ email, password }) => {
@@ -176,6 +182,8 @@ function App() {
               onSearch={handleSearch}
               onClear={clearSearch}
               onUseLocation={useMyLocation}
+              onStopLocation={stopUsingLocation}
+              isUsingLocation={Boolean(userLocation)}
               geolocationLoading={geolocationLoading}
               geolocationMessage={geolocationMessage}
             />
