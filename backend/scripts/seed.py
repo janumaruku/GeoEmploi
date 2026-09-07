@@ -59,8 +59,6 @@ def seed(db: Session, n_offers: int, n_employers: int) -> None:
 
     for _ in range(n_offers):
         commune, lat, lng = random.choice(COMMUNES)
-        # légère dispersion autour du centre-ville pour éviter que toutes
-        # les offres d'une même commune se superposent exactement
         jitter = lambda v: v + random.uniform(-0.03, 0.03)
         offer = Offer(
             employer_id=random.choice(employers).id,
