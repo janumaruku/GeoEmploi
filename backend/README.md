@@ -148,14 +148,18 @@ curl http://localhost:8000/health
 ## 7. Peupler la base pour le test de charge
 
 Le cabinet exige un test de charge sur une base d'au moins 500 offres réparties sur au moins
-50 communes. Script fourni :
+50 communes. Le script crée 1 000 offres par défaut et garantit au moins une offre dans
+chacune des 51 communes :
 ```bash
-python -m scripts.seed --offers 500 --employers 60
+python -m scripts.seed --offers 1000 --employers 60
 ```
 Crée des employeurs vérifiés et des offres réalistes (Faker) réparties sur 51 communes
 françaises réelles avec coordonnées (`scripts/communes.py`). Pensé pour tourner sur une base
 de test qu'on recrée avant chaque campagne, pas sur une base de prod (pas de dédoublonnage,
 relancer le script ajoute de nouvelles lignes).
+
+Le nombre passé à `--offers` doit être au moins égal à 51. Sans argument,
+`python -m scripts.seed` utilise automatiquement 1 000 offres.
 
 ## Structure du projet
 
@@ -235,10 +239,36 @@ curl http://localhost:8000/api/v1/users/1 \
   -H "Authorization: Bearer <token_reçu>"
 ```
 
+## Cartographie IGN
+
+Le fond de carte est déjà relié au service WMTS public de la Géoplateforme IGN. Le frontend
+n'appelle pas IGN directement : Leaflet appelle le proxy
+`GET /api/v1/map/tiles/{z}/{x}/{y}`, qui télécharge et met en cache les tuiles IGN.
+
+Variables disponibles dans `backend/.env` :
+
+```env
+IGN_WMTS_BASE_URL=https://data.geopf.fr/wmts
+IGN_WMTS_LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2
+IGN_WMTS_TIMEOUT_SECONDS=8
+MAP_CACHE_DIR=/tmp/geoemploi-map-cache
+```
+
+`GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2` est une couche publique et ne demande pas de clé API.
+Ne place jamais une éventuelle clé IGN dans le frontend : elle serait visible dans le
+navigateur. Pour une couche privée, conserver la clé uniquement dans `backend/.env`, ne pas
+committer ce fichier et adapter le proxy pour transmettre la clé au service privé.
+
+Les offres affichées au-dessus de la carte viennent de PostgreSQL, pas d'IGN. Après un seed,
+`scripts/seed.py` crée des offres avec une adresse, une latitude et une longitude. Le WMTS
+IGN sert seulement les images du fond de carte.
+
+Le géocodage d'une nouvelle adresse n'est pas encore automatisé : `POST /offers` attend
+toujours `latitude` et `longitude` dans son corps JSON.
+
 ## Prochaines étapes possibles
 
-- Géolocalisation : le sujet impose l'usage des flux IGN / API Adresse (pas de fournisseur
-  tiers type OpenStreetMap) pour tout géocodage — module séparé, pas encore branché ici.
+- Ajouter un géocodage d'adresse si la saisie automatique des coordonnées devient nécessaire.
 - Dashboard employeur (`GET /users/{id}/dashboard`) et tableau de bord métriques admin
   détaillé, au-delà des compteurs bruts actuels dans `/admin/metrics`.
 - Rafraîchissement de token (refresh token) — pour l'instant, le token expiré oblige

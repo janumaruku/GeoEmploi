@@ -3,7 +3,7 @@ par le cabinet : au moins 500 offres réparties sur au moins 50 communes.
 
 Usage :
     python -m scripts.seed
-    python -m scripts.seed --offers 500 --employers 60
+    python -m scripts.seed --offers 1000 --employers 60
 
 Idempotent-friendly : n'échoue pas si relancé, mais crée de nouvelles
 lignes à chaque exécution (pas de dédoublonnage) — pensé pour tourner sur
@@ -36,6 +36,11 @@ JOB_TITLES = [
 
 
 def seed(db: Session, n_offers: int, n_employers: int) -> None:
+    if n_offers < len(COMMUNES):
+        raise ValueError(f"Il faut au moins {len(COMMUNES)} offres pour couvrir toutes les communes.")
+    if n_employers < 1:
+        raise ValueError("Il faut au moins un employeur.")
+
     employers: list[User] = []
     for i in range(n_employers):
         user = User(
@@ -57,8 +62,11 @@ def seed(db: Session, n_offers: int, n_employers: int) -> None:
     db.commit()
     print(f"{n_employers} employeurs créés.")
 
-    for _ in range(n_offers):
-        commune, lat, lng = random.choice(COMMUNES)
+    communes = COMMUNES.copy()
+    random.shuffle(communes)
+
+    for index in range(n_offers):
+        commune, lat, lng = communes[index % len(communes)]
         jitter = lambda v: v + random.uniform(-0.03, 0.03)
         offer = Offer(
             employer_id=random.choice(employers).id,
@@ -77,7 +85,7 @@ def seed(db: Session, n_offers: int, n_employers: int) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--offers", type=int, default=500)
+    parser.add_argument("--offers", type=int, default=1000)
     parser.add_argument("--employers", type=int, default=60)
     args = parser.parse_args()
 
