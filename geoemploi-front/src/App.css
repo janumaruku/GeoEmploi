@@ -1,3 +1,4 @@
+/*Avant : (identité "État")
 :root {
   --blue: #1b3a6b;
   --ink: #161616;
@@ -7,6 +8,25 @@
   --surface: #f4f6f8;
   --accent: #d64045;
   --font-title: "Marianne", Arial, sans-serif;
+  --font-body: "Spectral", Georgia, serif;
+}
+ */
+
+/* Identité neutre (hors charte de l'État)
+  --primary : violet #6d28d9, repris du favicon déjà présent dans le
+  projet. Pas de bleu institutionnel (#000091) ni le rouge Marianne.
+  --font-title : "Poppins" remplace "Marianne" (police officielle de
+  l'État) sans-serif géométrique courante, libre de droits.
+*/
+:root {
+  --primary: #6d28d9;
+  --ink: #161616;
+  --muted: #666b73;
+  --line: #dfe3e8;
+  --paper: #fff;
+  --surface: #f4f6f8;
+  --accent: #d64045;
+  --font-title: "Poppins", "Segoe UI", Arial, sans-serif;
   --font-body: "Spectral", Georgia, serif;
 }
 
@@ -29,63 +49,68 @@
 .navbar-left, .navbar-right { display: flex; align-items: center; }
 .navbar-left { gap: clamp(12px, 2vw, 24px); min-width: 0; }
 .navbar-right { gap: 10px; flex-shrink: 0; }
+/* bloc "Ministère" + séparateur.
 .ministere { display: flex; flex-direction: column; font-family: Arial, sans-serif; font-size: 10px; font-weight: 800; line-height: 1.22; letter-spacing: .02em; }
 .separator { width: 1px; height: 38px; background: var(--line); }
-.logo { margin: 0; color: var(--blue); font-family: var(--font-title); font-size: clamp(23px, 2.6vw, 30px); letter-spacing: -.03em; }
+*/
+
+/* Nouveau : plus de mention "Ministère" dans l'en-tête voir App.jsx. 
+  Seule règle qui reste ici pour l'en-tête : le logo. */
+.logo { margin: 0; color: var(--primary); font-family: var(--font-title); font-size: clamp(23px, 2.6vw, 30px); letter-spacing: -.03em; }
 .navbar button { min-height: 42px; padding: 9px 16px; border-radius: 3px; color: var(--ink); background: transparent; border: 1px solid transparent; cursor: pointer; }
 .login-button:hover { text-decoration: underline; text-underline-offset: 4px; }
-.navbar .register-button { color: var(--blue); border-color: var(--blue); font-weight: 700; }
+.navbar .register-button { color: var(--primary); border-color: var(--primary); font-weight: 700; }
 .register-button:hover { background: #edf1f7; }
 
 .workspace { min-height: calc(100vh - 82px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 390px); }
 .map-section { min-width: 0; display: flex; flex-direction: column; padding: 22px 24px 24px; }
 .map-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
-.eyebrow { margin: 0 0 4px; color: var(--blue); font-family: var(--font-title); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.eyebrow { margin: 0 0 4px; color: var(--primary); font-family: var(--font-title); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .map-heading h2 { margin: 0; font-family: var(--font-title); font-size: clamp(22px, 2.5vw, 32px); line-height: 1.1; }
 .result-count { margin: 0; color: var(--muted); white-space: nowrap; }
-.result-count strong { color: var(--blue); font-family: var(--font-title); font-size: 22px; }
+.result-count strong { color: var(--primary); font-family: var(--font-title); font-size: 22px; }
 
 .location-search { margin-bottom: 18px; }
 .location-search label { display: block; margin-bottom: 7px; font: 700 14px var(--font-title); }
 .search-controls { display: flex; gap: 8px; }
 .search-controls input { min-width: 0; flex: 1; min-height: 42px; padding: 8px 11px; border: 1px solid #858585; border-radius: 3px; background: #fff; color: var(--ink); }
-.location-search button { min-height: 42px; padding: 8px 13px; border: 1px solid var(--blue); border-radius: 3px; background: #fff; color: var(--blue); font-family: var(--font-title); font-weight: 700; cursor: pointer; }
+.location-search button { min-height: 42px; padding: 8px 13px; border: 1px solid var(--primary); border-radius: 3px; background: #fff; color: var(--primary); font-family: var(--font-title); font-weight: 700; cursor: pointer; }
 .location-search button:hover { background: #edf1f7; }
 .location-search .clear-search { border-color: transparent; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 .map-shell { position: relative; flex: 1; min-height: 350px; overflow: hidden; border: 1px solid #ccd5d6; border-radius: 4px; background: #eef1f3; box-shadow: 0 8px 24px rgb(27 58 107 / 9%); }
 .leaflet-map { width: 100%; height: 100%; min-height: 350px; font-family: var(--font-body); }
 .leaflet-offer-marker { display: grid; place-items: center; width: 34px; height: 34px; border: 3px solid #fff; border-radius: 50% 50% 50% 5px; background: var(--accent); color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / 35%); rotate: -45deg; font: 800 12px var(--font-title); }
-.leaflet-offer-marker.is-selected { width: 39px; height: 39px; background: var(--blue); }
+.leaflet-offer-marker.is-selected { width: 39px; height: 39px; background: var(--primary); }
 .tile-error { position: absolute; z-index: 1000; left: 50%; top: 12px; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 9px 12px; transform: translateX(-50%); border: 1px solid #e5b8b6; border-radius: 3px; background: rgb(255 247 247 / 95%); color: #8f1d19; font-size: 13px; text-align: center; }
 .unlocated-offers { position: absolute; z-index: 900; right: 12px; bottom: 25px; max-width: 230px; padding: 10px; border: 1px solid var(--line); border-radius: 3px; background: rgb(255 255 255 / 95%); box-shadow: 0 3px 12px rgb(0 0 0 / 15%); }
-.unlocated-offers strong { display: block; margin-bottom: 5px; font: 700 12px var(--font-title); }.unlocated-offers button { display: block; width: 100%; padding: 5px; overflow: hidden; border: 0; background: transparent; color: var(--blue); text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.unlocated-offers strong { display: block; margin-bottom: 5px; font: 700 12px var(--font-title); }.unlocated-offers button { display: block; width: 100%; padding: 5px; overflow: hidden; border: 0; background: transparent; color: var(--primary); text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .map-fallback { height: 100%; min-height: 350px; display: grid; grid-template-rows: auto 1fr; }
 .map-unavailable { padding: 20px; text-align: center; background: #f6f7f8; border-bottom: 1px solid var(--line); }
-.map-unavailable > span { color: var(--blue); font-size: 24px; }.map-unavailable h3 { margin: 5px 0; font: 800 16px var(--font-title); }.map-unavailable p { margin: 0; color: var(--muted); font-size: 13px; }
+.map-unavailable > span { color: var(--primary); font-size: 24px; }.map-unavailable h3 { margin: 5px 0; font: 800 16px var(--font-title); }.map-unavailable p { margin: 0; color: var(--muted); font-size: 13px; }
 .fallback-offers { overflow-y: auto; display: grid; align-content: start; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; background: #eef1f3; }
 .fallback-offers button { min-width: 0; padding: 12px; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 3px; background: #fff; color: var(--ink); text-align: left; cursor: pointer; }
-.fallback-offers button:hover, .fallback-offers button.is-selected { border-left-color: var(--blue); background: #f8faff; }
+.fallback-offers button:hover, .fallback-offers button.is-selected { border-left-color: var(--primary); background: #f8faff; }
 .fallback-offers strong, .fallback-offers span { display: block; }.fallback-offers strong { font-family: var(--font-title); }.fallback-offers span { overflow: hidden; margin-top: 4px; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 
 .offer-panel { overflow-y: auto; background: var(--paper); border-left: 1px solid var(--line); }
 .offer-card { padding: 30px clamp(24px, 3vw, 36px); }
 .offer-card h2 { margin: 0 0 6px; font: 800 26px/1.15 var(--font-title); letter-spacing: -.025em; }
-.company { margin: 0; color: var(--blue); font-weight: 700; }
+.company { margin: 0; color: var(--primary); font-weight: 700; }
 .offer-details { margin: 26px 0; padding: 18px 0; border-block: 1px solid var(--line); }
 .offer-details div { display: grid; grid-template-columns: 28px 72px 1fr; align-items: center; gap: 4px; margin: 9px 0; }
-.offer-details dt { color: var(--muted); font-size: 13px; }.offer-details dd { margin: 0; font-size: 14px; font-weight: 700; }.detail-icon { color: var(--blue); font: 800 16px var(--font-title); }
+.offer-details dt { color: var(--muted); font-size: 13px; }.offer-details dd { margin: 0; font-size: 14px; font-weight: 700; }.detail-icon { color: var(--primary); font: 800 16px var(--font-title); }
 .offer-section { margin-top: 24px; }.offer-section h3 { margin: 0 0 9px; font: 800 16px var(--font-title); }.offer-section p { margin: 0; color: #454a50; font-size: 15px; line-height: 1.6; }
 .offer-section h4 { margin: 18px 0 8px; font: 700 14px var(--font-title); }
 .offer-missions { margin: 0; padding-left: 20px; color: #454a50; font-size: 15px; line-height: 1.55; }
 .offer-missions li + li { margin-top: 6px; }
-.apply-button { width: 100%; min-height: 46px; margin-top: 24px; border: 2px solid var(--blue); border-radius: 3px; background: #fff; color: var(--blue); font-family: var(--font-title); font-weight: 800; cursor: pointer; }
+.apply-button { width: 100%; min-height: 46px; margin-top: 24px; border: 2px solid var(--primary); border-radius: 3px; background: #fff; color: var(--primary); font-family: var(--font-title); font-weight: 800; cursor: pointer; }
 .apply-button:hover { background: #edf1f7; }
-.apply-auth { margin-top: 12px; padding: 12px; border-left: 3px solid var(--blue); background: #f1f4f8; }
+.apply-auth { margin-top: 12px; padding: 12px; border-left: 3px solid var(--primary); background: #f1f4f8; }
 .apply-auth p { margin: 0 0 10px; font-size: 14px; }
 .apply-auth div { display: flex; gap: 8px; }
-.apply-auth button { min-height: 40px; flex: 1; border: 1px solid var(--blue); background: #fff; color: var(--blue); font-weight: 700; cursor: pointer; }
-.status-message { min-height: 360px; display: grid; place-content: center; justify-items: center; padding: 30px; text-align: center; }.status-icon { display: grid; place-items: center; width: 46px; height: 46px; border: 2px solid var(--blue); border-radius: 50%; color: var(--blue); font: 800 22px var(--font-title); }.status-message h2 { margin: 18px 0 8px; font: 800 21px var(--font-title); }.status-message p { max-width: 280px; margin: 0; color: var(--muted); line-height: 1.5; }.status-loading .status-icon { animation: spin 1.2s linear infinite; }.status-error .status-icon { border-color: #b8292f; color: #b8292f; }
+.apply-auth button { min-height: 40px; flex: 1; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-weight: 700; cursor: pointer; }
+.status-message { min-height: 360px; display: grid; place-content: center; justify-items: center; padding: 30px; text-align: center; }.status-icon { display: grid; place-items: center; width: 46px; height: 46px; border: 2px solid var(--primary); border-radius: 50%; color: var(--primary); font: 800 22px var(--font-title); }.status-message h2 { margin: 18px 0 8px; font: 800 21px var(--font-title); }.status-message p { max-width: 280px; margin: 0; color: var(--muted); line-height: 1.5; }.status-loading .status-icon { animation: spin 1.2s linear infinite; }.status-error .status-icon { border-color: #b8292f; color: #b8292f; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 button:focus-visible { outline: 3px solid #ffbf47; outline-offset: 3px; }
@@ -99,13 +124,13 @@ button:focus-visible { outline: 3px solid #ffbf47; outline-offset: 3px; }
 .login-modal form { display: grid; gap: 9px; }
 .login-modal label { margin-top: 8px; font: 700 14px var(--font-title); }
 .login-modal input { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid #888; border-radius: 3px; color: var(--ink); background: #fff; }
-.submit-login { min-height: 48px; margin-top: 15px; border: 2px solid var(--blue); border-radius: 3px; background: #fff; color: var(--blue); font-family: var(--font-title); font-weight: 800; cursor: pointer; }
+.submit-login { min-height: 48px; margin-top: 15px; border: 2px solid var(--primary); border-radius: 3px; background: #fff; color: var(--primary); font-family: var(--font-title); font-weight: 800; cursor: pointer; }
 .submit-login:hover { background: #edf1f7; }
 .form-error { margin: 7px 0 0; padding: 9px 11px; border-left: 3px solid #ce0500; background: #fceceb; color: #8f1d19; font-size: 14px; }
 .form-success { margin: 7px 0 0; padding: 9px 11px; border-left: 3px solid #18753c; background: #eaf7ef; color: #145c32; font-size: 14px; }
 .role-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 20px 0 12px; }
-.role-tabs button { min-height: 42px; border: 1px solid var(--blue); background: #fff; color: var(--blue); font-weight: 700; cursor: pointer; }
-.role-tabs button.active { background: var(--blue); color: #fff; }
+.role-tabs button { min-height: 42px; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-weight: 700; cursor: pointer; }
+.role-tabs button.active { background: var(--primary); color: #fff; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
 
@@ -129,7 +154,30 @@ button:focus-visible { outline: 3px solid #ffbf47; outline-offset: 3px; }
 @media (max-width: 580px) {
   .navbar { align-items: stretch; flex-direction: column; gap: 8px; padding-block: 10px; }
   .navbar-left { justify-content: center; }.navbar-right { justify-content: center; }.navbar-right button { flex: 1; padding-inline: 10px; }
+  /*  Réglages responsive du bloc "Ministère" et du séparateur, ces deux éléments n'existent
+     plus dans le HTML (voir App.jsx).
   .ministere { font-size: 9px; }.separator { height: 32px; }
+  */
   .workspace { min-height: calc(100vh - 132px); }.map-section { min-height: 500px; padding: 16px 10px; }.map-heading { align-items: start; flex-direction: column; gap: 8px; }.map-shell { min-height: 370px; }
   .search-controls { flex-wrap: wrap; }.search-controls input { flex-basis: 100%; }.search-controls button { flex: 1; }.fallback-offers { grid-template-columns: 1fr; }.offer-card { padding: 25px 20px; }.offer-card h2 { font-size: 23px; }
+}
+
+/*  Nouveau : pied de page de mention obligatoire
+ Exigence : mention exacte "Démonstrateur technique, ne constitue pas un
+ service public en exploitation." sur toutes les pages publiques, y
+ compris les pages d'erreur.
+
+ Cette app est une SPA sans route d'erreur séparée : le layout .app
+ englobe aussi bien l'écran principal que les états d'erreur affichés via
+ <StatusMessage>. Le <footer> ajouté dans App.jsx (voir ce fichier) est
+ donc visible dans tous ces cas. Styles ci-dessous, il n'existait rien
+ d'équivalent avant.
+ */
+.site-footer {
+  padding: 14px clamp(18px, 3vw, 44px);
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
 }
