@@ -259,16 +259,33 @@ Ne place jamais une éventuelle clé IGN dans le frontend : elle serait visible 
 navigateur. Pour une couche privée, conserver la clé uniquement dans `backend/.env`, ne pas
 committer ce fichier et adapter le proxy pour transmettre la clé au service privé.
 
-Les offres affichées au-dessus de la carte viennent de PostgreSQL, pas d'IGN. Après un seed,
-`scripts/seed.py` crée des offres avec une adresse, une latitude et une longitude. Le WMTS
-IGN sert seulement les images du fond de carte.
+Les offres affichées au-dessus de la carte viennent de PostgreSQL, pas d'IGN. Une nouvelle
+offre contient une `commune` et les coordonnées de son centroïde. Le WMTS IGN sert seulement
+les images du fond de carte.
 
-Le géocodage d'une nouvelle adresse n'est pas encore automatisé : `POST /offers` attend
-toujours `latitude` et `longitude` dans son corps JSON.
+`POST /offers` n'accepte plus d'adresse postale précise. L'ancienne colonne `address` reste
+temporairement en base pour compatibilité, mais elle n'est plus exposée par `OfferRead`.
+
+### Reprise des anciennes offres
+
+La migration Alembic ajoute `offers.commune` sans modifier les offres existantes. Le script
+de reprise fonctionne ensuite en simulation par défaut :
+
+```bash
+python -m scripts.migrate_offer_communes
+```
+
+Après vérification de toute la sortie, la reprise peut être enregistrée explicitement :
+
+```bash
+python -m scripts.migrate_offer_communes --apply
+```
+
+Le script extrait la commune de l'ancienne adresse et récupère son centroïde auprès de l'API
+Découpage administratif. Si une commune échoue, le mode `--apply` annule toute la transaction.
 
 ## Prochaines étapes possibles
 
-- Ajouter un géocodage d'adresse si la saisie automatique des coordonnées devient nécessaire.
 - Dashboard employeur (`GET /users/{id}/dashboard`) et tableau de bord métriques admin
   détaillé, au-delà des compteurs bruts actuels dans `/admin/metrics`.
 - Rafraîchissement de token (refresh token) — pour l'instant, le token expiré oblige

@@ -40,8 +40,8 @@ function OfferCard({ offer, isAuthenticated, userRole, onApply, onLogin, onRegis
       <dl className="offer-details">
         <div>
           <span className="detail-icon" aria-hidden="true">⌖</span>
-          <dt>Adresse</dt>
-          <dd>{offer.address}</dd>
+          <dt>Commune</dt>
+          <dd>{offer.commune}</dd>
         </div>
       </dl>
       {/* Un champ "Contrat" affichait le texte fixe
@@ -52,8 +52,8 @@ function OfferCard({ offer, isAuthenticated, userRole, onApply, onLogin, onRegis
       <dl className="offer-details">
         <div>
           <span className="detail-icon" aria-hidden="true">⌖</span>
-          <dt>Adresse</dt>
-          <dd>{offer.address}</dd>
+          <dt>Commune</dt>
+          <dd>{offer.commune}</dd>
         </div>
         <div>
           <span className="detail-icon" aria-hidden="true">◷</span>

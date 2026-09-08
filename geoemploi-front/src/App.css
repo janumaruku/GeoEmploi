@@ -228,9 +228,9 @@ button:focus-visible { outline: 3px solid #ffbf47; outline-offset: 3px; }
 .application-row > div:first-child { display: flex; align-items: center; gap: 10px; }
 .application-row-actions { display: flex; gap: 6px; }
 
-/*Autocomplétion d'adresse
-   L'employeur ne tape plus de coordonnées : il choisit une adresse dans une
-   liste déroulante alimentée par la Base Adresse Nationale. Pur ajout,
+/* Autocomplétion de commune
+   L'employeur choisit une commune dans une liste alimentée par l'API
+   Découpage administratif. Pur ajout,
    aucune règle existante modifiée. */
 .address-field { position: relative; }
 .address-suggestions { position: absolute; z-index: 50; top: calc(100% + 2px); left: 0; right: 0; max-height: 240px; overflow-y: auto; margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 3px; background: #fff; box-shadow: 0 8px 24px rgb(0 0 0 / 14%); }

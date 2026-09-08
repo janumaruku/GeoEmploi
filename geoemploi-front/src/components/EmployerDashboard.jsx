@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 import { createOffer, deleteOffer, getEmployerOffers } from '../api/offers.js'
 import { getOfferApplications, updateApplicationStatus } from '../api/applications.js'
-// L'employeur ne saisit plus latitude/longitude à la main :
-// il tape une adresse, la Base Adresse Nationale renvoie les coordonnées.
-import { searchAddresses } from '../api/geocode.js'
+import { searchCommunes } from '../api/geocode.js'
 
 const emptyForm = {
   title: '',
   description: '',
-  address: '',
-  // latitude/longitude restent dans l'état du formulaire, mais ne sont plus
-  // tapées par l'employeur : elles sont remplies automatiquement quand il
-  // choisit une adresse dans la liste de suggestions (voir selectAddress).
+  commune: '',
   latitude: '',
   longitude: '',
   diffusion_radius_km: '10',
@@ -51,14 +46,9 @@ function EmployerDashboard({ currentUser }) {
   const [applicationsLoading, setApplicationsLoading] = useState(false)
   const [applicationsError, setApplicationsError] = useState(false)
 
-  // Autocomplétion d'adresse
-  // `addressSuggestions` : propositions renvoyées par la Base Adresse
-  // Nationale. `addressPicked` : passe à true dès qu'une proposition est
-  // choisie, tant qu'il vaut false, on refuse de publier, sinon on
-  // enverrait une offre sans coordonnées (donc invisible sur la carte).
-  const [addressSuggestions, setAddressSuggestions] = useState([])
-  const [addressLoading, setAddressLoading] = useState(false)
-  const [addressPicked, setAddressPicked] = useState(false)
+  const [communeSuggestions, setCommuneSuggestions] = useState([])
+  const [communeLoading, setCommuneLoading] = useState(false)
+  const [communePicked, setCommunePicked] = useState(false)
 
   async function loadOffers() {
     setOffersLoading(true)
@@ -88,55 +78,44 @@ function EmployerDashboard({ currentUser }) {
     setForm({ ...form, [name]: value })
   }
 
-  // Recherche d'adresse, déclenchée à la frappe
-  // On attend 300 ms après la dernière touche avant d'interroger la BAN
-  // (« debounce ») : sans ça, on enverrait une requête par caractère tapé.
   useEffect(() => {
-    // Une fois l'adresse choisie, plus rien à chercher : on ferme la liste.
-    if (addressPicked) return undefined
+    if (communePicked) return undefined
 
     let cancelled = false
     const timer = setTimeout(async () => {
-      // Moins de 3 caractères : la BAN refuse la requête, on vide la liste
-      // sans appeler le réseau.
-      if (form.address.trim().length < 3) {
-        if (!cancelled) setAddressSuggestions([])
+      if (form.commune.trim().length < 2) {
+        if (!cancelled) setCommuneSuggestions([])
         return
       }
-      if (!cancelled) setAddressLoading(true)
+      if (!cancelled) setCommuneLoading(true)
       try {
-        const results = await searchAddresses(form.address)
-        if (!cancelled) setAddressSuggestions(results)
+        const results = await searchCommunes(form.commune)
+        if (!cancelled) setCommuneSuggestions(results)
       } catch {
-        if (!cancelled) setAddressSuggestions([])
+        if (!cancelled) setCommuneSuggestions([])
       } finally {
-        if (!cancelled) setAddressLoading(false)
+        if (!cancelled) setCommuneLoading(false)
       }
     }, 300)
 
     return () => { cancelled = true; clearTimeout(timer) }
-  }, [form.address, addressPicked])
+  }, [form.commune, communePicked])
 
-  // L'employeur clique sur une proposition : on enregistre l'adresse
-  // complète ET ses coordonnées, d'un seul coup.
-  function selectAddress(suggestion) {
+  function selectCommune(suggestion) {
     setForm((previous) => ({
       ...previous,
-      address: suggestion.label,
+      commune: suggestion.name,
       latitude: String(suggestion.latitude),
       longitude: String(suggestion.longitude),
     }))
-    setAddressSuggestions([])
-    setAddressPicked(true)
+    setCommuneSuggestions([])
+    setCommunePicked(true)
   }
 
-  // Si l'employeur remodifie l'adresse après avoir choisi, les anciennes
-  // coordonnées ne correspondent plus : on les vide et on relance la
-  // recherche, pour ne jamais publier une offre au mauvais endroit.
-  function changeAddress(event) {
+  function changeCommune(event) {
     const { value } = event.target
-    setForm((previous) => ({ ...previous, address: value, latitude: '', longitude: '' }))
-    setAddressPicked(false)
+    setForm((previous) => ({ ...previous, commune: value, latitude: '', longitude: '' }))
+    setCommunePicked(false)
   }
 
   async function submitOffer(event) {
@@ -146,7 +125,7 @@ function EmployerDashboard({ currentUser }) {
     // part sur la carte. On bloque avant l'appel réseau plutôt que de
     // laisser le backend renvoyer une erreur obscure.
     if (!form.latitude || !form.longitude) {
-      setCreateError('Choisissez une adresse dans la liste de propositions pour localiser l’offre.')
+      setCreateError('Choisissez une commune dans la liste de propositions.')
       return
     }
     setIsCreating(true)
@@ -154,7 +133,7 @@ function EmployerDashboard({ currentUser }) {
       await createOffer({
         title: form.title,
         description: form.description || null,
-        address: form.address,
+        commune: form.commune,
         latitude: Number(form.latitude),
         longitude: Number(form.longitude),
         diffusion_radius_km: Number(form.diffusion_radius_km) || 10,
@@ -162,12 +141,12 @@ function EmployerDashboard({ currentUser }) {
       setForm(emptyForm)
       // ON remet aussi l'autocomplétion à zéro, sinon la prochaine
       // offre repartirait avec l'adresse précédente considérée comme choisie.
-      setAddressPicked(false)
-      setAddressSuggestions([])
+      setCommunePicked(false)
+      setCommuneSuggestions([])
       setIsFormOpen(false)
       await loadOffers()
     } catch {
-      setCreateError('Impossible de créer cette offre. Vérifiez les champs (notamment la latitude/longitude).')
+      setCreateError('Impossible de créer cette offre. Vérifiez la commune sélectionnée.')
     } finally {
       setIsCreating(false)
     }
@@ -231,49 +210,23 @@ function EmployerDashboard({ currentUser }) {
           <label htmlFor="offer-description">Description</label>
           <textarea id="offer-description" name="description" value={form.description} onChange={updateFormField} rows={3} />
 
-          {/* Adresse libre + latitude/longitude tapées à la main.
-              Conservé en commentaire : c'est ce que remplace l'autocomplétion
-              ci-dessous. Les coordonnées sont désormais déduites de l'adresse.
-          <label htmlFor="offer-address">Adresse</label>
-          <input id="offer-address" name="address" value={form.address} onChange={updateFormField} required />
-
-          <div className="offer-form-row">
-            <div>
-              <label htmlFor="offer-lat">Latitude</label>
-              <input id="offer-lat" name="latitude" type="number" step="any" value={form.latitude} onChange={updateFormField} required />
-            </div>
-            <div>
-              <label htmlFor="offer-lng">Longitude</label>
-              <input id="offer-lng" name="longitude" type="number" step="any" value={form.longitude} onChange={updateFormField} required />
-            </div>
-            <div>
-              <label htmlFor="offer-radius">Rayon de diffusion (km)</label>
-              <input id="offer-radius" name="diffusion_radius_km" type="number" step="any" value={form.diffusion_radius_km} onChange={updateFormField} />
-            </div>
-          </div>
- */}
-
-          {/* L'employeur tape une adresse (rue, ville, code postal,
-              arrondissement…) et choisit dans la liste. La latitude et la
-              longitude sont remplies automatiquement à partir de la Base
-              Adresse Nationale : plus aucune coordonnée à saisir. */}
-          <label htmlFor="offer-address">Adresse du poste</label>
+          <label htmlFor="offer-commune">Commune du poste</label>
           <div className="address-field">
             <input
-              id="offer-address"
-              name="address"
-              value={form.address}
-              onChange={changeAddress}
-              placeholder="Ex. 12 rue de Rivoli, Paris"
+              id="offer-commune"
+              name="commune"
+              value={form.commune}
+              onChange={changeCommune}
+              placeholder="Ex. Paris ou 75000"
               autoComplete="off"
               required
             />
-            {addressSuggestions.length > 0 && (
+            {communeSuggestions.length > 0 && (
               <ul className="address-suggestions">
-                {addressSuggestions.map((suggestion) => (
-                  <li key={`${suggestion.label}-${suggestion.latitude}`}>
-                    <button type="button" onClick={() => selectAddress(suggestion)}>
-                      <strong>{suggestion.label}</strong>
+                {communeSuggestions.map((suggestion) => (
+                  <li key={suggestion.code}>
+                    <button type="button" onClick={() => selectCommune(suggestion)}>
+                      <strong>{suggestion.name}</strong>
                       <span>{suggestion.context}</span>
                     </button>
                   </li>
@@ -281,10 +234,10 @@ function EmployerDashboard({ currentUser }) {
               </ul>
             )}
           </div>
-          {addressLoading && <p className="dashboard-hint">Recherche de l’adresse…</p>}
-          {addressPicked && (
+          {communeLoading && <p className="dashboard-hint">Recherche de la commune…</p>}
+          {communePicked && (
             <p className="address-confirmed" role="status">
-              Adresse localisée : {Number(form.latitude).toFixed(5)}, {Number(form.longitude).toFixed(5)}
+              Commune sélectionnée : {form.commune}
             </p>
           )}
 
@@ -315,7 +268,7 @@ function EmployerDashboard({ currentUser }) {
               <div className="dashboard-offer-main">
                 <div>
                   <h3>{offer.title}</h3>
-                  <p className="dashboard-hint">{offer.address}</p>
+                  <p className="dashboard-hint">{offer.commune}</p>
                 </div>
                 <span className={`status-badge status-badge-${offer.status}`}>
                   {offerStatusLabels[offer.status] ?? offer.status}

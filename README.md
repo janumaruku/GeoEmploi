@@ -74,9 +74,10 @@ GeoEmploi/
 ## Données des offres et fond de carte IGN
 
 Les marqueurs ne sont pas des offres fournies par IGN. Ils correspondent aux offres de la
-base PostgreSQL, récupérées par le frontend avec `GET /api/v1/offers`. Le script
-`backend/scripts/seed.py` crée 1 000 offres de démonstration par défaut. Il garantit au
-moins une offre dans chacune des 51 communes, puis répartit les offres restantes entre elles.
+base PostgreSQL, récupérées par le frontend avec `GET /api/v1/offers`. Chaque nouvelle offre
+stocke une commune et les coordonnées du centroïde renvoyé par l'API Découpage administratif.
+Le script `backend/scripts/seed.py` crée 1 000 offres de démonstration par défaut. Il garantit
+au moins une offre dans chacune des 51 communes, puis répartit les offres restantes entre elles.
 
 IGN fournit uniquement le fond cartographique :
 
@@ -99,9 +100,9 @@ secret au frontend ni committer de clé dans Git. Une clé ne serait nécessaire
 ressource IGN privée ou à accès restreint ; dans ce cas, elle devrait être ajoutée uniquement
 dans `backend/.env`, jamais dans `geoemploi-front/.env`, puis prise en charge par le proxy.
 
-Il n'y a pas encore de géocodage automatique : lors de la création d'une offre, le backend
-attend toujours une latitude et une longitude. IGN ne crée et ne fournit aucune offre
-d'emploi.
+Le formulaire employeur recherche uniquement des communes. Il ne collecte plus de rue ni de
+numéro. L'API publique `geo.api.gouv.fr/communes` fournit le nom de la commune et son
+centroïde ; IGN ne crée et ne fournit aucune offre d'emploi.
 
 ## Prochaine session : relancer le projet
 

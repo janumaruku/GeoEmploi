@@ -1,39 +1,42 @@
-// Service utilisé : la Base Adresse Nationale (BAN), API publique et
-// officielle française. Gratuite, sans clé d'API, et elle autorise les appels
-// directs depuis le navigateur (CORS ouvert).
-//   Doc : https://adresse.data.gouv.fr/api-doc/adresse
+// L'API Découpage administratif fournit les communes et leur centroïde.
+// Documentation : https://geo.api.gouv.fr/decoupage-administratif/communes
 
-const BAN_SEARCH_URL = 'https://api-adresse.data.gouv.fr/search/'
+const COMMUNES_URL = 'https://geo.api.gouv.fr/communes'
 
-// Recherche une adresse et renvoie une liste de propositions normalisées.
-// Chaque proposition porte déjà les coordonnées, donc aucun second appel
-// n'est nécessaire une fois que l'employeur a choisi dans la liste.
-export async function searchAddresses(query, limit = 5) {
+// Recherche une commune et normalise son nom et son centroïde.
+export async function searchCommunes(query, limit = 5) {
   const cleaned = query.trim()
-  // La BAN renvoie une erreur en dessous de 3 caractères : on évite l'appel.
-  if (cleaned.length < 3) return []
+  if (cleaned.length < 2) return []
 
-  const url = `${BAN_SEARCH_URL}?q=${encodeURIComponent(cleaned)}&limit=${limit}`
+  const parameter = /^\d{5}$/.test(cleaned) ? 'codePostal' : 'nom'
+  const params = new URLSearchParams({
+    [parameter]: cleaned,
+    fields: 'nom,code,centre,departement,codesPostaux',
+    boost: 'population',
+    limit: String(limit),
+  })
 
   let response
   try {
-    response = await fetch(url)
+    response = await fetch(`${COMMUNES_URL}?${params}`)
   } catch {
-    throw new Error('Le service d’adresses est momentanément indisponible.')
+    throw new Error('Le service des communes est momentanément indisponible.')
   }
   if (!response.ok) {
-    throw new Error('Le service d’adresses est momentanément indisponible.')
+    throw new Error('Le service des communes est momentanément indisponible.')
   }
 
   const data = await response.json()
-  return (data.features ?? []).map((feature) => ({
-    // `label` = adresse complète lisible ("12 Rue de Rivoli 75004 Paris")
-    label: feature.properties.label,
-    city: feature.properties.city,
-    postcode: feature.properties.postcode,
-    context: feature.properties.context, // "75, Paris, Île-de-France"
-    // GeoJSON renvoie [longitude, latitude] dans cet ordre.
-    longitude: feature.geometry.coordinates[0],
-    latitude: feature.geometry.coordinates[1],
-  }))
+  return data
+    .filter((commune) => commune.centre?.coordinates?.length === 2)
+    .map((commune) => ({
+      name: commune.nom,
+      code: commune.code,
+      postcodes: commune.codesPostaux ?? [],
+      context: commune.departement
+        ? `${commune.departement.code} · ${commune.departement.nom}`
+        : `Code INSEE ${commune.code}`,
+      longitude: commune.centre.coordinates[0],
+      latitude: commune.centre.coordinates[1],
+    }))
 }

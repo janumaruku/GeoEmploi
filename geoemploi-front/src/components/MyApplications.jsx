@@ -62,7 +62,7 @@ function MyApplications({ offers }) {
                 <div className="dashboard-offer-main">
                   <div>
                     <h3>{offer ? offer.title : `Offre n°${application.offer_id}`}</h3>
-                    {offer && <p className="dashboard-hint">{offer.address}</p>}
+                    {offer && <p className="dashboard-hint">{offer.commune}</p>}
                   </div>
                   <span className={`status-badge status-badge-${application.status}`}>
                     {applicationStatusLabels[application.status] ?? application.status}

@@ -1,4 +1,5 @@
 import enum
+import re
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum, DateTime, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -20,6 +21,7 @@ class Offer(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
 
+    commune = Column(String, nullable=True)
     address = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
@@ -33,3 +35,10 @@ class Offer(Base):
 
     employer = relationship("User")
     applications = relationship("Application", back_populates="offer", cascade="all, delete-orphan")
+
+    @property
+    def public_commune(self) -> str:
+        if self.commune:
+            return self.commune
+        legacy_value = self.address.rsplit(",", 1)[-1].strip()
+        return re.sub(r"^\d{5}\s+", "", legacy_value)

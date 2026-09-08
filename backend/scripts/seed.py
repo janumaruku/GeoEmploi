@@ -22,6 +22,7 @@ from app.models.employer_profile import EmployerProfile, VerificationStatus
 from app.models.offer import Offer, OfferStatus
 from app.core.security import hash_password
 from scripts.communes import COMMUNES
+from scripts.commune_centroids import get_commune_centroid
 
 fake = Faker("fr_FR")
 
@@ -62,19 +63,20 @@ def seed(db: Session, n_offers: int, n_employers: int) -> None:
     db.commit()
     print(f"{n_employers} employeurs créés.")
 
-    communes = COMMUNES.copy()
-    random.shuffle(communes)
+    commune_names = [name for name, _, _ in COMMUNES]
+    random.shuffle(commune_names)
+    communes = [get_commune_centroid(name) for name in commune_names]
 
     for index in range(n_offers):
         commune, lat, lng = communes[index % len(communes)]
-        jitter = lambda v: v + random.uniform(-0.03, 0.03)
         offer = Offer(
             employer_id=random.choice(employers).id,
             title=random.choice(JOB_TITLES),
             description=fake.paragraph(nb_sentences=3),
-            address=f"{fake.street_address()}, {commune}",
-            latitude=jitter(lat),
-            longitude=jitter(lng),
+            commune=commune,
+            address=commune,
+            latitude=lat,
+            longitude=lng,
             diffusion_radius_km=random.choice([5, 10, 20, 30]),
             status=OfferStatus.APPROVED,
         )

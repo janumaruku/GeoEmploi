@@ -4,11 +4,12 @@ from app.db.session import SessionLocal
 from app.models.user import User, UserRole, UserStatus
 from app.models.offer import Offer, OfferStatus
 from app.core.security import hash_password
+from scripts.commune_centroids import get_commune_centroid
 
 COMMUNES = [
-    ("75013 Paris", 48.829, 2.361),
-    ("69002 Lyon", 45.757, 4.832),
-    ("33000 Bordeaux", 44.837, -0.579),
+    "Paris",
+    "Lyon",
+    "Bordeaux",
 ]
 
 def seed_demo(db: Session) -> None:
@@ -51,12 +52,14 @@ def seed_demo(db: Session) -> None:
     if db.query(Offer).count() < 10:
         demo_titles = ["Développeur Python", "Chef de projet digital", "Data Analyst"]
         for i, title in enumerate(demo_titles):
-            commune, lat, lng = COMMUNES[i % len(COMMUNES)]
+            commune_query = COMMUNES[i % len(COMMUNES)]
+            commune, lat, lng = get_commune_centroid(commune_query)
             db.add(Offer(
                 employer_id=employer.id,
                 title=title,
                 description=f"Offre de démonstration — {title}",
-                address=f"1 Rue Principale, {commune}",
+                commune=commune,
+                address=commune,
                 latitude=lat,
                 longitude=lng,
                 diffusion_radius_km=10.0,

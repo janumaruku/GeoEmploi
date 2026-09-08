@@ -60,7 +60,7 @@ function OffersFallback({ offers, selectedOfferId, onSelectOffer }) {
       <div className="fallback-offers" aria-label="Liste des offres">
         {offers.map((offer) => (
           <button key={offer.id} type="button" className={offer.id === selectedOfferId ? 'is-selected' : ''} onClick={() => onSelectOffer(offer)}>
-            <strong>{offer.title}</strong><span>{offer.address}</span>
+            <strong>{offer.title}</strong><span>{offer.commune}</span>
           </button>
         ))}
       </div>

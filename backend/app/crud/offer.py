@@ -9,7 +9,8 @@ def create_offer(db: Session, employer_id: int, data: OfferCreate) -> Offer:
         employer_id=employer_id,
         title=data.title,
         description=data.description,
-        address=data.address,
+        commune=data.commune,
+        address=data.commune,
         latitude=data.latitude,
         longitude=data.longitude,
         diffusion_radius_km=data.diffusion_radius_km,
@@ -41,10 +42,12 @@ def list_offers(
 
 
 def update_offer(db: Session, offer: Offer, data: OfferUpdate) -> Offer:
-    for field in ("title", "description", "address", "latitude", "longitude", "diffusion_radius_km"):
+    for field in ("title", "description", "commune", "latitude", "longitude", "diffusion_radius_km"):
         value = getattr(data, field)
         if value is not None:
             setattr(offer, field, value)
+    if data.commune is not None:
+        offer.address = data.commune
     db.commit()
     db.refresh(offer)
     return offer

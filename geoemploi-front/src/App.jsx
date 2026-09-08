@@ -123,7 +123,7 @@ function App() {
   // Filtrage sur la commune uniquement 
   // const searchedCity = normalizeText(activeQuery)
   // const visibleOffers = activeQuery
-  //   ? offers.filter((offer) => normalizeText(offer.address).includes(searchedCity))
+  //   ? offers.filter((offer) => normalizeText(offer.commune).includes(searchedCity))
   //   : offers
 
   //  On croise les deux critères (métier ET commune), chacun
@@ -132,7 +132,7 @@ function App() {
   const searchedCity = normalizeText(activeQuery)
   const searchedKeyword = normalizeText(activeKeyword)
   const visibleOffers = offers.filter((offer) => {
-    const matchesCity = !activeQuery || normalizeText(offer.address).includes(searchedCity)
+    const matchesCity = !activeQuery || normalizeText(offer.commune).includes(searchedCity)
     const matchesKeyword = !activeKeyword
       || normalizeText(offer.title).includes(searchedKeyword)
       || normalizeText(offer.description).includes(searchedKeyword)
@@ -171,7 +171,7 @@ function App() {
     //  Sélection de la 1re offre sur le seul critère commune
     // const normalizedQuery = normalizeText(cleanedQuery)
     // const firstMatch = offers.find((offer) => {
-    //   return normalizeText(offer.address).includes(normalizedQuery)
+    //   return normalizeText(offer.commune).includes(normalizedQuery)
     // })
     // setSelectedOffer(firstMatch || null)
   
@@ -180,7 +180,7 @@ function App() {
     const normalizedQuery = normalizeText(cleanedQuery)
     const normalizedKeyword = normalizeText(cleanedKeyword)
     const firstMatch = offers.find((offer) => {
-      const matchesCity = !cleanedQuery || normalizeText(offer.address).includes(normalizedQuery)
+      const matchesCity = !cleanedQuery || normalizeText(offer.commune).includes(normalizedQuery)
       const matchesKeyword = !cleanedKeyword
         || normalizeText(offer.title).includes(normalizedKeyword)
         || normalizeText(offer.description).includes(normalizedKeyword)
