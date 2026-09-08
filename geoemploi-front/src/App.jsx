@@ -264,8 +264,28 @@ function App() {
         ...profile,
       })
       setRegistrationMessage({ ok: true, text: role === 'employer' ? 'Compte employeur créé.' : 'Compte créé.' })
-    } catch {
-      setRegistrationMessage({ ok: false, text: 'Impossible de créer le compte.' })
+    } catch (error) {
+      //  AVANT :  message générique, quelle que soit la cause réelle :
+      // } catch {
+      //   setRegistrationMessage({ ok: false, text: 'Impossible de créer le compte.' })
+      // }
+    
+      // NOUVEAU : on distingue au moins le cas le plus courant (adresse déjà
+      // utilisée, 409 renvoyé par POST /users) du reste, pour ne pas laisser
+      // la personne deviner pourquoi ça échoue.
+    
+      //  AVANT : confirmait explicitement qu'un compte existe pour
+      // cette adresse (« Un compte existe déjà avec cette adresse
+      // e-mail. ») : ça permet à n'importe qui de tester des adresses une
+      // par une pour savoir lesquelles sont inscrites sur le site
+      // (énumération de comptes), ne pratique déconseillée en
+      // cybersécurité, même si elle reste courante sur beaucoup de sites.
+  
+    
+      // NOUVEAU : on guide sans confirmer.
+      let text = 'Impossible de créer le compte. Réessayez dans un instant.'
+      if (error.status === 409) text = 'Cette inscription n’a pas pu aboutir. Si vous avez déjà un compte, connectez-vous plutôt.'
+      setRegistrationMessage({ ok: false, text })
     } finally {
       setIsSubmitting(false)
     }
