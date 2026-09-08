@@ -53,7 +53,10 @@ class UserUpdate(BaseModel):
 
 class UserRead(BaseModel):
     id: int
-    email: EmailStr
+    # Certaines données de démonstration utilisent le domaine réservé
+    # `.test`. On conserve EmailStr à l'inscription, mais la lecture doit
+    # pouvoir sérialiser ces comptes déjà présents en base.
+    email: str
     role: UserRole
     status: UserStatus
     created_at: datetime

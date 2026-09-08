@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 import { applyToOffer } from './api/applications.js'
 import { login, logout as apiLogout, registerUser } from './api/auth.js'
-import { getToken, getUserIdFromToken, setToken as storeToken } from './api/authToken.js'
+import { getToken, setToken as storeToken } from './api/authToken.js'
 import { getOffers } from './api/offers.js'
 // connexion/enregistrement complets : il faut savoir QUI est
 // connecté (candidat ou employeur) pour proposer le bon espace ensuite.
-import { getUser } from './api/users.js'
+import { getCurrentUser } from './api/users.js'
+import AdminPanel from './components/AdminPanel.jsx'
 import EmployerDashboard from './components/EmployerDashboard.jsx'
 import LoginModal from './components/LoginModal.jsx'
 import MapView from './components/MapView.jsx'
@@ -54,28 +55,37 @@ function App() {
   // d'offres (par défaut), le tableau de bord employeur, et l'espace
   // "Mes candidatures" du candidat.
   const [currentUser, setCurrentUser] = useState(null)
+  const [currentUserLoading, setCurrentUserLoading] = useState(Boolean(token))
   const [view, setView] = useState('offers')
+  const [path, setPath] = useState(() => window.location.pathname)
+
+  const navigate = useCallback((nextPath) => {
+    if (window.location.pathname !== nextPath) window.history.pushState({}, '', nextPath)
+    setPath(nextPath)
+  }, [])
+
+  useEffect(() => {
+    const handlePopState = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
     async function loadCurrentUser() {
       if (!token) {
-        if (!cancelled) setCurrentUser(null)
+        if (!cancelled) { setCurrentUser(null); setCurrentUserLoading(false) }
         return
       }
-      const userId = getUserIdFromToken(token)
-      if (!userId) {
-        // Token illisible : on nettoie une session invalide plutôt que de
-        // rester bloqué avec un token qu'on ne peut pas exploiter.
-        apiLogout()
-        if (!cancelled) { setToken(null); setCurrentUser(null) }
-        return
-      }
+      if (!cancelled) setCurrentUserLoading(true)
       try {
-        const user = await getUser(userId)
+        const user = await getCurrentUser()
         if (!cancelled) setCurrentUser(user)
       } catch {
-        if (!cancelled) setCurrentUser(null)
+        apiLogout()
+        if (!cancelled) { setToken(null); setCurrentUser(null) }
+      } finally {
+        if (!cancelled) setCurrentUserLoading(false)
       }
     }
     loadCurrentUser()
@@ -291,7 +301,7 @@ function App() {
     }
   }
 
-  const logout = () => {
+  const logout = useCallback(() => {
     apiLogout()
     setToken(null)
     // On revient à la recherche d'offres en quittant un espace
@@ -299,6 +309,12 @@ function App() {
     // fois déconnecté.
     setCurrentUser(null)
     setView('offers')
+    navigate('/')
+  }, [navigate])
+
+  const openOffers = () => {
+    setView('offers')
+    navigate('/')
   }
 
   return (
@@ -330,6 +346,15 @@ function App() {
               {view === 'applications' ? 'Retour aux offres' : 'Mes candidatures'}
             </button>
           )}
+          {currentUser?.role === 'admin' && (
+            <button
+              className="login-button nav-view-button"
+              aria-pressed={path === '/admin'}
+              onClick={() => path === '/admin' ? openOffers() : navigate('/admin')}
+            >
+              {path === '/admin' ? 'Retour aux offres' : 'Administration'}
+            </button>
+          )}
           {token ? (
             <button className="login-button" onClick={logout}>Se déconnecter</button>
           ) : (
@@ -356,7 +381,23 @@ function App() {
             supprimé, seulement enveloppé dans cette condition pour
             cohabiter avec le tableau de bord employeur et "Mes
             candidatures". */}
-        {view === 'dashboard' && currentUser?.role === 'employer' ? (
+        {path === '/admin' ? (
+          currentUserLoading ? (
+            <section className="admin-access"><p>Vérification de votre accès…</p></section>
+          ) : currentUser?.role === 'admin' ? (
+            <AdminPanel onSessionExpired={logout} />
+          ) : (
+            <section className="admin-access" aria-labelledby="admin-access-title">
+              <h2 id="admin-access-title">Accès réservé</h2>
+              <p>Cette page est réservée aux administrateurs connectés.</p>
+              {!token ? (
+                <button className="dashboard-primary-button" type="button" onClick={() => setIsLoginOpen(true)}>Se connecter</button>
+              ) : (
+                <button className="dashboard-primary-button" type="button" onClick={openOffers}>Retour aux offres</button>
+              )}
+            </section>
+          )
+        ) : view === 'dashboard' && currentUser?.role === 'employer' ? (
           <EmployerDashboard currentUser={currentUser} />
         ) : view === 'applications' && currentUser?.role === 'job_seeker' ? (
           <MyApplications offers={offers} />

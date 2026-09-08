@@ -8,3 +8,7 @@ import { apiRequest } from './client.js'
 export function getUser(userId) {
   return apiRequest(`/users/${userId}`)
 }
+
+export function getCurrentUser() {
+  return apiRequest('/users/me')
+}
