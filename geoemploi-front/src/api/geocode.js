@@ -32,7 +32,7 @@ export async function searchAddresses(query, limit = 5) {
     city: feature.properties.city,
     postcode: feature.properties.postcode,
     context: feature.properties.context, // "75, Paris, Île-de-France"
-    // GeoJSON renvoie [longitude, latitude] — dans cet ordre.
+    // GeoJSON renvoie [longitude, latitude] dans cet ordre.
     longitude: feature.geometry.coordinates[0],
     latitude: feature.geometry.coordinates[1],
   }))

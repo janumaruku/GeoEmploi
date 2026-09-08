@@ -3,7 +3,7 @@ import StatusMessage from './StatusMessage.jsx'
 
 // Accepte en plus `userRole` afin de ne pas proposer de postuler à un compte
 // employeur, qui ne peut de toute façon pas candidater (le backend renvoie
-// déjà une 403 dans ce cas — voir le message d'erreur existant plus bas).
+// déjà une 403 dans ce ca,  voir le message d'erreur existant plus bas).
 function OfferCard({ offer, isAuthenticated, userRole, onApply, onLogin, onRegister }) {
   const [showAuthChoice, setShowAuthChoice] = useState(false)
   const [applicationLoading, setApplicationLoading] = useState(false)
