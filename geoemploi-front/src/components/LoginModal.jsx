@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
+import LegalModal from './LegalModal.jsx'
 
-function LoginModal({ isOpen, onClose, onSubmit, isSubmitting, error }) {
+// Modale de connexion existante : formulaire e-mail/mot de passe, focus
+// automatique sur le champ e-mail à l'ouverture, fermeture au clavier (Échap)
+// ou au clic sur le fond, et affichage d'une erreur de connexion le cas échéant.
+function LoginModal({ isOpen, onClose, onSubmit, isSubmitting, error, onSwitchToRegister }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const emailRef = useRef(null)
+  // Eétat d'ouverture du panneau "mot de passe oublié".
+  const [isForgotOpen, setIsForgotOpen] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -56,12 +62,40 @@ function LoginModal({ isOpen, onClose, onSubmit, isSubmitting, error }) {
             onChange={(event) => setPassword(event.target.value)}
             required
           />
+          {/* lien "mot de passe oublié". Ouvre un panneau
+              d'information plutôt que de simuler un envoi d'e-mail : le
+              backend n'a pas d'endpoint de réinitialisation pour l'instant
+              (voir le contenu du panneau, et le point signalé dans le chat). */}
+          <p className="forgot-password">
+            <button type="button" className="inline-link" onClick={() => setIsForgotOpen(true)}>
+              Mot de passe oublié ?
+            </button>
+          </p>
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="submit-login" type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Connexion…' : 'Se connecter'}
           </button>
         </form>
+        {/* Passerelle vers l'inscription. */}
+        <p className="modal-switch">
+          Pas encore de compte ?{' '}
+          <button type="button" className="inline-link" onClick={onSwitchToRegister}>
+            Créer un compte
+          </button>
+        </p>
       </section>
+
+      <LegalModal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)} title="Mot de passe oublié">
+        <p>
+          La réinitialisation automatique par e-mail n’est pas encore disponible sur ce démonstrateur
+          technique : elle nécessite un endpoint backend dédié (envoi d’un lien à usage unique), qui n’existe
+          pas encore dans cette version.
+        </p>
+        <p>
+          En attendant, si vous avez perdu l’accès à un compte de test, le plus simple est de créer un
+          nouveau compte avec une autre adresse e-mail.
+        </p>
+      </LegalModal>
     </div>
   )
 }
