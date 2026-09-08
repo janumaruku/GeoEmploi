@@ -1,5 +1,5 @@
 # GéoEmploi
-
+ 
 Plateforme de recherche d'emploi géolocalisée pour le Ministère du Job et Bonheur.
 Backend FastAPI + PostgreSQL, frontend React + Vite, cartographie Leaflet sur fonds IGN.
 
